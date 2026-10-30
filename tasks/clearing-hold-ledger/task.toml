@@ -1,0 +1,11 @@
+version = "1.0"
+
+[metadata]
+name = "clearing-hold-ledger"
+lane = "event-sourcing-repair"
+difficulty = "hard"
+languages = ["python"]
+tags = ["event-sourcing", "idempotency", "holds", "state-replay"]
+
+[verifier]
+timeout_sec = 60

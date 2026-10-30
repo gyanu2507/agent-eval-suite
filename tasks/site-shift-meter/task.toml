@@ -1,0 +1,11 @@
+version = "1.0"
+
+[metadata]
+name = "site-shift-meter"
+lane = "distribution-shift"
+difficulty = "medium"
+languages = ["python"]
+tags = ["distribution-shift", "calibration", "auroc", "tabular"]
+
+[verifier]
+timeout_sec = 120

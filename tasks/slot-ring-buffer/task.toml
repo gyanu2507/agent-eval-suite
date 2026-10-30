@@ -1,0 +1,11 @@
+version = "1.0"
+
+[metadata]
+name = "slot-ring-buffer"
+lane = "systems"
+difficulty = "hard"
+languages = ["python"]
+tags = ["ring-buffer", "dual-consumer", "backpressure", "packets"]
+
+[verifier]
+timeout_sec = 60

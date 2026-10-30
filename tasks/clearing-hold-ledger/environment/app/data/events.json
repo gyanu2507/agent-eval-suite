@@ -1,0 +1,18 @@
+[
+  {"seq": 10, "type": "POST", "wallet": "w_alpha", "amount": 100.0, "dedupe_key": "post-alpha-100"},
+  {"seq": 2, "type": "POST", "wallet": "w_beta", "amount": 40.0, "dedupe_key": "post-beta-40"},
+  {"seq": 3, "type": "MOVE", "src": "w_beta", "dst": "w_gamma", "amount": 15.0, "dedupe_key": "move-b-g-15"},
+  {"seq": 4, "type": "HOLD", "wallet": "w_alpha", "amount": 30.0, "hold_key": "h-a-30", "dedupe_key": "hold-a-30"},
+  {"seq": 5, "type": "HOLD", "wallet": "w_alpha", "amount": 90.0, "hold_key": "h-a-too-big", "dedupe_key": "hold-a-too-big"},
+  {"seq": 6, "type": "DRAW", "wallet": "w_gamma", "amount": 15.0, "dedupe_key": "draw-g-15"},
+  {"seq": 7, "type": "RELEASE", "wallet": "w_alpha", "hold_key": "h-a-30", "dedupe_key": "release-a-30"},
+  {"seq": 8, "type": "RELEASE", "wallet": "w_alpha", "hold_key": "h-missing", "dedupe_key": "release-missing"},
+  {"seq": 9, "type": "POST", "wallet": "w_alpha", "amount": 5.0, "dedupe_key": "post-alpha-100-extra"},
+  {"seq": 11, "type": "POST", "wallet": "w_delta", "amount": 0.0, "dedupe_key": "post-delta-0"},
+  {"seq": 12, "type": "MOVE", "src": "w_alpha", "dst": "w_beta", "amount": 20.0, "dedupe_key": "move-a-b-20"},
+  {"seq": 1, "type": "POST", "wallet": "w_omega", "amount": 7.0, "dedupe_key": "post-omega-7"},
+  {"seq": 13, "type": "DRAW", "wallet": "w_omega", "amount": 7.0, "dedupe_key": "draw-omega-7"},
+  {"seq": 14, "type": "HOLD", "wallet": "w_beta", "amount": 10.0, "hold_key": "h-b-10", "dedupe_key": "hold-b-10"},
+  {"seq": 15, "type": "RELEASE", "wallet": "w_beta", "hold_key": "h-b-10", "dedupe_key": "release-b-10"},
+  {"seq": 16, "type": "POST", "wallet": "w_alpha", "amount": 1.0, "dedupe_key": "post-alpha-100"}
+]

@@ -1,8 +1,8 @@
 # agent-eval-suite
 
-Public samples of how I design agent evaluation tasks.
+Public samples of how I design agent evaluation tasks. Original code and synthetic data only.
 
-These are **original** tasks. Same craft as the private eval work (repair trajectories, systems contracts, shift + calibration gates). No private packages shipped here.
+Read the [case study](docs/case-study.md) if you want the reasoning behind one pass bar, not just the files.
 
 ## Tasks
 
@@ -12,36 +12,16 @@ These are **original** tasks. Same craft as the private eval work (repair trajec
 | [`slot-ring-buffer`](tasks/slot-ring-buffer) | Systems | Bring a packet ring buffer to a harder contract (capacity, discard, dual cursors) |
 | [`site-shift-meter`](tasks/site-shift-meter) | Distribution shift | Train under site shift, report an honest control, clear a calibrated gate |
 
-Each task has:
-
-- `instruction.md` — agent-facing prompt
-- `environment/` — starter code / data
-- `tests/` — verifier
-- `solution/` — reference fix
-- `CALIBRATION.md` — why the pass bar sits where it does
+Each task has `instruction.md`, a buggy starter, tests, an oracle, and `CALIBRATION.md`.
 
 ## How to run locally
 
 ```bash
-# Ledger
-python3 tasks/clearing-hold-ledger/environment/app/clearing_main.py
-pytest -q tasks/clearing-hold-ledger/tests
-
-# Ring buffer
-pytest -q tasks/slot-ring-buffer/tests
-
-# Site-shift meter (CPU, tiny synthetic data)
-python3 tasks/site-shift-meter/environment/app/train_and_eval.py
-pytest -q tasks/site-shift-meter/tests
+pytest -q -p no:randomly tasks/clearing-hold-ledger/tests
+pytest -q -p no:randomly tasks/slot-ring-buffer/tests
+pytest -q -p no:randomly tasks/site-shift-meter/tests
 ```
 
-## What this is meant to prove
+## Design bar
 
-I build evaluations that:
-
-1. Fail a stock / buggy starter for a known reason
-2. Pass a careful oracle
-3. Recompute scores from artifacts (not vibes)
-4. Document calibration and anti-shortcuts
-
-Private corpora stay private. This suite is the public, attribution-safe slice.
+A task ships when the starter fails for a reason I can name, the oracle passes, the verifier recomputes the score from artifacts, and the calibration note says which shortcuts are blocked.

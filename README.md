@@ -2,7 +2,7 @@
 
 Public samples of how I design agent evaluation tasks. Original code and synthetic data only.
 
-Read the [case study](docs/case-study.md) if you want the reasoning behind one pass bar, not just the files.
+Read the [case study](docs/case-study.md) for pass-bar reasoning, and the [trace review](docs/trace-review.md) for how I score a failing agent run.
 
 ## Tasks
 

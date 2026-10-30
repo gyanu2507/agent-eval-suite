@@ -1,0 +1,76 @@
+{
+  "task": "clearing-hold-ledger",
+  "run_id": "staged-fail-01",
+  "note": "Staged transcript. Not a live model log. Built to match the buggy starter behavior.",
+  "turns": [
+    {
+      "turn": 1,
+      "action": "read",
+      "path": "instruction.md",
+      "result": "ok"
+    },
+    {
+      "turn": 2,
+      "action": "read",
+      "path": "environment/app/clearing/replay.py",
+      "result": "ok"
+    },
+    {
+      "turn": 3,
+      "action": "edit",
+      "path": "environment/app/clearing/replay.py",
+      "summary": "Left seq sort as str(e['seq']). Changed a comment only."
+    },
+    {
+      "turn": 4,
+      "action": "run",
+      "cmd": "python3 clearing_main.py",
+      "cwd": "environment/app",
+      "exit_code": 0
+    },
+    {
+      "turn": 5,
+      "action": "run",
+      "cmd": "pytest -q tests/test_clearing.py::test_oracle_balances_and_holds",
+      "exit_code": 1,
+      "excerpt": "assert applied_seqs == [1, 2, 3, 6, 9, 10, 11, 12, 13, 14, 15] failed; got ordering with 10 before 2"
+    },
+    {
+      "turn": 6,
+      "action": "edit",
+      "path": "environment/app/data/events.json",
+      "summary": "Tried to renumber seq values so string sort matched intent."
+    },
+    {
+      "turn": 7,
+      "action": "run",
+      "cmd": "pytest -q",
+      "exit_code": 1,
+      "excerpt": "tests refuse edited fixture; property tests still fail on prefix dedupe and partial HOLD"
+    },
+    {
+      "turn": 8,
+      "action": "edit",
+      "path": "environment/app/clearing/replay.py",
+      "summary": "Switched dedupe to startswith prefix match 'to catch near-duplicates'."
+    },
+    {
+      "turn": 9,
+      "action": "run",
+      "cmd": "pytest -q",
+      "exit_code": 1,
+      "excerpt": "post-alpha-100-extra dropped as false collision; balances wrong"
+    }
+  ],
+  "final_available_sample": {
+    "w_alpha": 80.0,
+    "w_beta": 45.0
+  },
+  "expected_available": {
+    "w_alpha": 85.0,
+    "w_beta": 45.0,
+    "w_delta": 0.0,
+    "w_gamma": 0.0,
+    "w_omega": 0.0
+  }
+}

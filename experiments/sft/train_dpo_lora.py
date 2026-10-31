@@ -47,25 +47,49 @@ def main() -> None:
     tok = AutoTokenizer.from_pretrained(args.model)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
-    model = AutoModelForCausalLM.from_pretrained(args.model)
+    import torch
+
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model, torch_dtype=torch.float16 if torch.cuda.is_available() else None
+    )
+
+    import inspect
 
     args.out.mkdir(parents=True, exist_ok=True)
-    trainer = DPOTrainer(
-        model=model,
-        train_dataset=ds,
-        peft_config=LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, task_type="CAUSAL_LM"),
-        args=DPOConfig(
-            output_dir=str(args.out),
-            num_train_epochs=1,
-            per_device_train_batch_size=1,
-            logging_steps=1,
-            report_to=[],
-        ),
-        processing_class=tok,
-    )
-    trainer.train()
+    cfg_kwargs = {
+        "output_dir": str(args.out),
+        "num_train_epochs": 1,
+        "per_device_train_batch_size": 1,
+        "logging_steps": 1,
+        "report_to": [],
+        "save_strategy": "no",
+        "fp16": torch.cuda.is_available(),
+        "remove_unused_columns": False,
+        "dataloader_pin_memory": False,
+        "max_length": 2048,
+        "max_prompt_length": 1024,
+    }
+    accepted = set(inspect.signature(DPOConfig.__init__).parameters)
+    cfg_kwargs = {k: v for k, v in cfg_kwargs.items() if k in accepted}
+    trainer_kwargs = {
+        "model": model,
+        "train_dataset": ds,
+        "peft_config": LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05, task_type="CAUSAL_LM"),
+        "args": DPOConfig(**cfg_kwargs),
+    }
+    trainer_sig = inspect.signature(DPOTrainer.__init__).parameters
+    if "processing_class" in trainer_sig:
+        trainer_kwargs["processing_class"] = tok
+    elif "tokenizer" in trainer_sig:
+        trainer_kwargs["tokenizer"] = tok
+    trainer = DPOTrainer(**trainer_kwargs)
+    train_out = trainer.train()
     trainer.save_model(str(args.out / "adapter"))
-    print("saved", args.out / "adapter")
+    (args.out / "train_metrics.json").write_text(
+        json.dumps({"train_loss": getattr(train_out, "training_loss", None)}, indent=2)
+        + "\n"
+    )
+    print("saved", args.out / "adapter", "loss", getattr(train_out, "training_loss", None))
 
 
 if __name__ == "__main__":

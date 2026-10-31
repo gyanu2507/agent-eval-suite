@@ -25,9 +25,14 @@ def _plain(messages: list[dict]) -> str:
 
 def main() -> None:
     t0 = time.time()
+    # Kaggle T4 images can expose 2 GPUs; DPOTrainer rejects DataParallel.
+    import os
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
     import torch
 
-    print("cuda", torch.cuda.is_available(), flush=True)
+    print("cuda", torch.cuda.is_available(), "n_visible", torch.cuda.device_count(), flush=True)
     if not torch.cuda.is_available():
         raise SystemExit("NO_CUDA")
     print("gpu", torch.cuda.get_device_name(0), flush=True)

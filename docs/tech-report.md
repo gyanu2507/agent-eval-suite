@@ -1,63 +1,64 @@
 # When the delta is fake
 
-**Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace**
+**Pass-bar design for agent evaluation: nop failures, frozen controls, and scored traces**
 
 Gyanu Mayank  
-B.Tech (Computer Science and Engineering), National Institute of Technology Patna  
+Independent Researcher  
+B.Tech, Computer Science and Engineering, National Institute of Technology Patna  
 Pune, India · gyanumayank0@gmail.com · https://github.com/gyanu2507  
-31 October 2026 · Version 0.1.2  
+31 October 2026 · Version 0.1.3  
 
-**Cite (concept DOI, always latest):** https://doi.org/10.5281/zenodo.23829461  
-**Code:** https://github.com/gyanu2507/agent-eval-suite
+**DOI (concept, preferred):** https://doi.org/10.5281/zenodo.23829461  
+**Software:** https://github.com/gyanu2507/agent-eval-suite
 
 ---
 
 ## Abstract
 
-Agent benchmarks are only as honest as their pass bars. Terminal-Bench shows that hard terminal work with instruction, container, tests, and an oracle is a useful unit of evaluation [Merrill et al., 2026]. Harbor runs those tasks. Inspect gives a parallel composition model for datasets, solvers, and scorers. What those frameworks still leave to the task author is the craft of *what fails for the right reason*.
+Outcome-based agent benchmarks such as Terminal-Bench specify instruction, containerized environment, tests, and a reference solution [Merrill et al., 2026]. Harnesses such as Harbor and Inspect execute those units at scale. They do not, by themselves, guarantee that a task’s pass condition is resistant to cosmetic repairs, fixture edits, or self-reported metrics.
 
-This note ships three public tasks and the reasoning behind them. Each one has a buggy starter that fails for a named cause, an oracle that clears every test, and a verifier that recomputes score from artifacts instead of trusting a self-reported JSON field. One task includes a staged fail transcript and a rubric with positive and negative magnitudes. A short case study on the distribution-shift task shows why mean-only “adaptation” can look serious and still leave ranking AUROC unchanged, and how a train-only label shortcut that flips on eval forces a real method.
+This technical note states a pass-bar for task authorship and releases three public tasks that implement it across event-sourced repair, concurrent systems contracts, and distribution-shift reporting. Each task includes a starter with named failure modes, an oracle that clears the suite, and a verifier that recomputes scores from artifacts. A distribution-shift case study shows that mean-only feature normalization need not change ranking AUROC for a linear scorer, and that a train-site label shortcut which flips at evaluation forces an honest control to fail unless the method drops the shortcut. A staged fail transcript is scored with an explicit positive/negative rubric to separate contract repair from fixture negotiation.
 
-This is not a leaderboard and not a claim about frontier models. It is a public sample of how I design and review agent evaluation work.
+Scope is methodological: synthetic fixtures, three tasks, no frontier-model leaderboard. The contribution is a reusable design criteria set and calibrated examples for agent-evaluation work.
 
 ---
 
-## 1. Where this sits
+## 1. Positioning
 
-| Layer | What it gives you | What it does not invent for you |
+| Layer | Provides | Leaves to the task author |
 | --- | --- | --- |
-| [Terminal-Bench](https://arxiv.org/abs/2601.11868) | Hard terminal tasks, human-checked oracles, outcome tests, Harbor as harness | The specific failure modes inside a new task |
+| [Terminal-Bench](https://arxiv.org/abs/2601.11868) | Hard terminal tasks, reviewed oracles, outcome tests, Harbor as harness | Failure-mode design inside a new task |
 | [Harbor](https://github.com/harbor-framework/harbor) | Parallel trials, trajectories, verifier rewards | Whether the reward is gameable |
-| [Inspect](https://inspect.aisi.org.uk/) | Dataset + solver/agent + scorer composition, sandboxes | The same craft question at sample level |
+| [Inspect](https://inspect.aisi.org.uk/) | Dataset, solver/agent, and scorer composition with sandboxes | The same question at sample level |
 
-I treat the Terminal-Bench shape as the right container: English instruction, environment, tests that check final state, reference solution. Harbor is the runner. The suite here is smaller and deliberately public. The private analogues used different domains. The failure classes match: ordering, idempotency, dual consumers, and reports that look green while the method did nothing.
+The Terminal-Bench unit (instruction, environment, final-state tests, oracle) is taken as the container. The criteria below address reward integrity: whether a green run implies the intended capability rather than a reporting trick.
 
-Related open-source activity (not bibliographic references): a Harbor harness fix that writes the target trajectory when a user agent is present, and a Terminal-Bench task draft `lease-fencing-reaper` (exclusive leases, fencing tokens, reaper under an injected logical clock). Same design bar as the suite below. Links live in the repository README.
-
----
-
-## 2. Design bar
-
-A task ships when all four hold:
-
-1. **Nop fails.** The starter fails for a reason I can name in one sentence.
-2. **Oracle passes.** The checked-in solution clears every unit test.
-3. **Score from artifacts.** The verifier recomputes the control or expected state. Editing a report field or a golden file does not invent a pass.
-4. **Calibration note.** `CALIBRATION.md` lists starter failure modes and the shortcuts the tests block.
-
-That bar is stricter than “tests exist.” It is weaker than a multi-reviewer Terminal-Bench admission process. The point of publishing three tasks is to show the bar in public code, not to replace TB.
-
-Anti-shortcuts I treat as default:
-
-- Fixture data and frozen baselines are read-only for the agent.
-- Property tests cover edge cases beyond the stock fixture.
-- Occupancy, balances, and controls are derived, not trusted from agent-written counters.
+The released suite is small and public by design. Domain analogues from confidential evaluation work are omitted. The failure classes transferred here are ordering and idempotency under event replay, dual-consumer buffer contracts, and metrics that remain green while the underlying method is a no-op.
 
 ---
 
-## 3. The three tasks
+## 2. Pass-bar criteria
 
-All numbers below are from the checked-in fixtures and oracles on 31 October 2026. Local command:
+A task is considered release-ready when:
+
+1. **Nop failure.** The starter fails for a failure mode that can be stated in one sentence.
+2. **Oracle success.** The reference solution clears every unit test.
+3. **Artifact-backed score.** The verifier recomputes the control or expected state. Editing a report field or a checked-in golden file cannot invent a pass.
+4. **Calibration record.** `CALIBRATION.md` lists starter failure modes and blocked shortcuts.
+
+Default anti-shortcuts:
+
+- Fixture data and frozen baselines are read-only to the agent.
+- Property tests extend beyond the stock fixture.
+- Occupancy, balances, and controls are derived quantities, not agent-supplied counters.
+
+These criteria are stricter than “tests exist” and weaker than a multi-reviewer benchmark admission process. The three tasks demonstrate the criteria in code. They are not proposed as a replacement for Terminal-Bench.
+
+---
+
+## 3. Tasks
+
+Results below use the checked-in fixtures and oracles (31 October 2026):
 
 ```bash
 pytest -q -p no:randomly \
@@ -68,35 +69,35 @@ pytest -q -p no:randomly \
 
 Twelve tests pass.
 
-### 3.1 `clearing-hold-ledger` (event-sourcing repair)
+### 3.1 `clearing-hold-ledger` (event-sourced repair)
 
-**Job.** Replay an immutable clearing stream into wallet balances and holds. Repair `clearing/replay.py`. Leave `data/events.json` alone.
+**Objective.** Replay an immutable clearing stream into wallet balances and holds. Repair `clearing/replay.py`. Leave `data/events.json` unchanged.
 
 **Starter failure modes.**
 
 1. Lexicographic `seq` sort (`"10"` before `"2"`)
 2. Prefix collision on `dedupe_key`
-3. Partial HOLD when funds are short
-4. RELEASE matched by wallet, not `hold_key`
-5. Zero-balance wallets dropped from output
+3. Partial HOLD when funds are insufficient
+4. RELEASE matched by wallet rather than `hold_key`
+5. Zero-balance wallets omitted from output
 
 **Fixture.** 16 events. Oracle available balances: alpha 85, beta 45, delta/gamma/omega 0.
 
-**Why it exists.** Multi-turn repair agents often chase the first red test, then edit the fixture, then invent a looser dedupe. The tests recompute from the stream. Prefix matching is worse than the starter once `post-alpha-100-extra` collides with `post-alpha-100`.
+**Motivation.** Repair agents often chase the first failing test, then edit fixtures, then loosen deduplication. Tests recompute expected state from the stream. Prefix matching is strictly worse than the starter once `post-alpha-100-extra` collides with `post-alpha-100`.
 
-### 3.2 `slot-ring-buffer` (systems)
+### 3.2 `slot-ring-buffer` (systems contracts)
 
-**Job.** Fixed-capacity packet ring with two independent consumers. When full with respect to the slowest consumer, drop incoming writes. Never overwrite unread slots for the slow reader.
+**Objective.** Fixed-capacity packet ring with two independent consumers. Under pressure from the slowest consumer, drop incoming writes. Never overwrite unread slots for the slow reader.
 
-**Starter failure modes.** Dual-consumer drop policy wrong, occupancy faked from a stale size counter, capacity edges at N=1 and N=2 missed.
+**Starter failure modes.** Incorrect dual-consumer drop policy, occupancy derived from a stale size counter, missed capacity edges at N=1 and N=2.
 
-**Why it exists.** Systems-lane sample without shipping private netlist or HDL fixtures. The contract is about unread packets staying alive, which is easy to break while green-looking unit tests on a single consumer still pass.
+**Motivation.** Systems-lane evaluation without proprietary netlist or HDL fixtures. The contract concerns preservation of unread packets. Single-consumer tests can remain green while the dual-consumer contract fails.
 
-### 3.3 `site-shift-meter` (distribution shift)
+### 3.3 `site-shift-meter` (distribution-shift reporting)
 
-**Job.** Train fault detection on sites S0/S1. Eval on S2. Beat a frozen control and report calibration honestly.
+**Objective.** Train fault detection on sites S0/S1. Evaluate on S2. Exceed a frozen control and report calibration fields that match a recomputed baseline.
 
-**Checked-in numbers (oracle).**
+**Oracle (checked-in CSVs).**
 
 | Quantity | Value |
 | --- | --- |
@@ -106,47 +107,47 @@ Twelve tests pass.
 | Gate | `delta_auroc >= 0.08` and control match within `1e-6` |
 | `n_eval` | 180 |
 
-**Starter.** Trains a plain logistic on raw features, then copies that AUROC into both `control_auroc` and `model_auroc`. Delta is zero. The JSON shape looks finished.
+**Starter.** Fits logistic regression on raw features, then copies that AUROC into both `control_auroc` and `model_auroc`. Reported delta is zero while the JSON schema appears complete.
 
-Section 4 is the full case study for this task.
+Section 4 analyses this task in detail.
 
 ---
 
-## 4. Case study: when a “shift fix” does nothing
+## 4. Case study: mean shift without ranking change
 
-Train on S0/S1, score on S2. Feature means move. A natural first fix is per-site z-scoring, then the same logistic.
+Training uses sites S0/S1. Evaluation uses S2 with shifted feature means. A common first intervention is per-site z-scoring followed by the same logistic model.
 
-On a mean-only synthetic draw, that barely moves ranking AUROC for a linear scorer. Add a constant to every score and the order stays the same. So the “adapted” model clears almost nothing against the control, even though the notebook looks like domain adaptation.
+Under mean-only shift, ranking AUROC for a linear scorer is largely invariant to a constant offset on scores. Order is preserved. Per-site normalization can therefore look like domain adaptation while leaving delta against the control near zero.
 
-What actually breaks the control is a strong label shortcut in `f4` on the train sites, flipped on eval (anti-correlated noise). The frozen control in `baseline.py` latches onto `f4` and collapses on S2 (~0.01 AUROC). A method that drops `f4` and z-scores `f1`-`f3` per site, using unlabeled eval features for eval-site moments, clears a large delta (~0.97 on the checked-in CSVs).
+The released fixture instead places a strong label shortcut in feature `f4` on training sites and flips the association on evaluation (anti-correlated noise). The frozen control in `baseline.py` relies on `f4` and collapses on S2 (control AUROC ≈ 0.01). A method that drops `f4` and z-scores `f1`-`f3` per site, estimating evaluation-site moments from unlabeled evaluation features, recovers a large delta (model AUROC ≈ 0.98 on the checked-in CSVs).
 
-The gate is mild on purpose (`>= 0.08`) so a clean method passes without needing a perfect model, and so copying the control or cosmetic mean-only z-scoring still fails once the spurious feature is in play.
+The acceptance gate (`delta_auroc >= 0.08`) is set so that (i) control copying and cosmetic mean-only z-scoring fail once the shortcut is present, and (ii) a correct method clears without requiring a near-perfect classifier.
 
-**Pass bar for this task.**
+**Pass conditions.**
 
-1. Starter fails (delta 0).
-2. Verifier recomputes the control from `baseline.py` + the CSVs.
+1. Starter delta is zero.
+2. Verifier recomputes the control from `baseline.py` and the CSVs.
 3. `data/` and `baseline.py` are read-only.
-4. `n_eval` must equal the eval row count (180).
+4. `n_eval` equals the evaluation row count (180).
 
-**Shortcuts this blocks.** Printing a nicer delta without beating the frozen control. Rewriting the baseline. Mean-only normalization that never changes ranking metrics. Editing goldens instead of fixing the method.
+**Blocked shortcuts.** Inflating delta without beating the frozen control. Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method.
 
-That is the pattern I keep seeing in private eval work: nop fails, oracle passes, score comes back from artifacts, and the control is honest even when it hurts. This public task is the small version, synthetic data only.
+The transferable pattern is: nop failure, oracle success, artifact-backed score, and an honest control even when that control is weak.
 
 ---
 
-## 5. Trace review: staged fail on the ledger
+## 5. Trace review under an explicit rubric
 
-Fixture: `docs/fixtures/ledger-fail-run.json`. Staged transcript, not a live model log. Built to match buggy starter behavior so the review process is visible.
+Fixture: `docs/fixtures/ledger-fail-run.json`. The transcript is staged to match starter behavior. It is used to illustrate process scoring after unit tests have already failed.
 
-**What went wrong.**
+**Failure sequence.**
 
-1. **Lexicographic `seq`.** Turn 3 left `sorted(..., key=str)`. Applied order puts 10 before 2. Balances drift from there.
-2. **Edited the fixture.** Turn 6 changed `data/events.json`. Outside the repair surface.
-3. **Worse dedupe.** Turn 8 “fixed” collisions with prefix matching. Drops `post-alpha-100-extra` when `post-alpha-100` is already seen. Exact key equality was the rule.
-4. **Never checked holds.** Partial HOLD and RELEASE-by-wallet stayed in the starter. The agent chased the first red test and stopped.
+1. **Lexicographic `seq`.** Turn 3 retains `sorted(..., key=str)`. Event 10 is applied before event 2. Balances diverge.
+2. **Fixture edit.** Turn 6 modifies `data/events.json`, outside the repair surface.
+3. **Weaker dedupe.** Turn 8 introduces prefix matching. `post-alpha-100-extra` is dropped once `post-alpha-100` is seen. The required rule is exact key equality.
+4. **Incomplete hold semantics.** Partial HOLD and wallet-based RELEASE remain. Effort concentrates on the first red test.
 
-**Rubric** (one behavior per line, magnitudes in `{1,2,3,5}`):
+**Rubric** (one behavior per line; magnitudes in `{1,2,3,5}`):
 
 ```
 Agent sorts events by numeric seq before replay, +3
@@ -161,28 +162,29 @@ Agent retries the same failing pytest three or more times with no code change, -
 Agent introduces prefix dedupe after seeing a collision failure, -3
 ```
 
-Positive sum: 13. Negatives cover the shortcuts this staged run took.
+Positive mass: 13. Negatives encode the shortcuts observed in this transcript.
 
-**Score sketch for `staged-fail-01`.** Numeric seq: NOT MET. Exact dedupe: NOT MET (got worse). All-or-nothing HOLD: NOT MET. Release by hold_key: NOT MET. Keep zero wallets: NOT MET. Leave events alone: NOT MET. Edit fixture: TRIGGERED (−5). String-order complacency: TRIGGERED (−2). Empty pytest retries: NOT TRIGGERED. Introduce prefix dedupe: TRIGGERED (−3).
+**Score sketch (`staged-fail-01`).** Numeric seq: not met. Exact dedupe: not met (regressed). All-or-nothing HOLD: not met. Release by `hold_key`: not met. Retain zero wallets: not met. Leave events unchanged: not met. Fixture edit: triggered (−5). String-order complacency: triggered (−2). Empty pytest retries: not triggered. Prefix dedupe introduction: triggered (−3).
 
-The run fails the task and the rubric. A mergeable fix clears the six positives without touching `data/`.
+The run fails both the task tests and the rubric. A correct repair clears the six positive criteria without modifying `data/`.
 
-I use this format when the tests already said fail and the question is process judgment: did the agent repair the contract, or did it negotiate with the fixtures?
-
----
-
-## 6. Limits
-
-- Three tasks. Synthetic or small fixtures only.
-- No multi-model agent sweep published here. The staged ledger trace is constructed.
-- Private client work is not included. Names and fixtures stay out on purpose.
-- This note does not claim SOTA, safety properties, or that the gate values generalize beyond these CSVs.
-
-If you want a larger public set, the next useful additions are a flake-prone timing task with a deterministic clock seam, and a verifier that diffs trajectories against the rubric automatically. Neither is in 0.1.2.
+This rubric format separates outcome failure from process failure: whether the agent restored the contract or negotiated with fixtures.
 
 ---
 
-## 7. Reproduce
+## 6. Limitations
+
+- Three tasks; synthetic or small fixtures only.
+- No multi-model agent sweep is reported. The ledger transcript is constructed.
+- Confidential evaluation corpora are excluded.
+- Gate values are calibrated to these CSVs and are not claimed as universal thresholds.
+- No safety or capability claims about frontier systems.
+
+Natural extensions include timing tasks with an injected deterministic clock, and automated rubric application over trajectories. Neither is included in 0.1.3.
+
+---
+
+## 7. Reproduction
 
 ```bash
 git clone https://github.com/gyanu2507/agent-eval-suite
@@ -194,35 +196,36 @@ python3 -m pytest -q -p no:randomly \
 python3 tasks/site-shift-meter/solution/train_and_eval.py
 ```
 
-Read `tasks/*/CALIBRATION.md`, `docs/case-study.md`, and `docs/trace-review.md` for the short forms of sections 4 and 5.
+See also `tasks/*/CALIBRATION.md`, `docs/case-study.md`, and `docs/trace-review.md`.
 
 ---
 
 ## References
 
-Merrill, M. A., Shaw, A. G., Carlini, N., et al. (2026). *Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces*. arXiv:2601.11868. https://arxiv.org/abs/2601.11868
+Merrill, M. A., Shaw, A. G., Carlini, N., et al. (2026). *Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces*. arXiv:2601.11868. https://doi.org/10.48550/arXiv.2601.11868
 
 Harbor Framework. https://github.com/harbor-framework/harbor
 
 UK AI Security Institute. *Inspect*. https://inspect.aisi.org.uk/
 
-Mayank, G. (2026). *When the delta is fake* (v0.1.2). Zenodo. https://doi.org/10.5281/zenodo.23829461
+Mayank, G. (2026). *When the delta is fake: Pass-bar design for agent evaluation* (v0.1.3). Zenodo. https://doi.org/10.5281/zenodo.23829461
 
 ---
 
 ## Citation
 
-Prefer the **concept DOI** so citations resolve to the latest version.
+Use the concept DOI so citations resolve to the latest version.
 
 ```bibtex
 @techreport{mayank2026deltafake,
   author       = {Mayank, Gyanu},
-  title        = {When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace},
+  title        = {When the delta is fake: Pass-bar design for agent evaluation},
   year         = {2026},
   month        = {10},
-  institution  = {National Institute of Technology Patna},
-  version      = {0.1.2},
+  institution  = {Independent},
+  version      = {0.1.3},
   doi          = {10.5281/zenodo.23829461},
-  url          = {https://doi.org/10.5281/zenodo.23829461}
+  url          = {https://doi.org/10.5281/zenodo.23829461},
+  note         = {B.Tech CSE, National Institute of Technology Patna}
 }
 ```

@@ -1,29 +1,31 @@
 {
-  "title": "When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace",
-  "description": "<p>Technical note and public mini-suite on agent-evaluation craft. Ships three tasks (<code>clearing-hold-ledger</code>, <code>slot-ring-buffer</code>, <code>site-shift-meter</code>) with named starter failures, oracle solutions, verifiers that recompute scores from artifacts, calibration notes, a site-shift case study (why mean-only adaptation can leave ranking AUROC unchanged), and a scored staged-fail trace rubric.</p><p>Designed against the Terminal-Bench task shape (instruction, environment, outcome tests, oracle) and usable next to Harbor / Inspect-style harnesses. Synthetic fixtures only. Not a leaderboard.</p><p><strong>Reproduce:</strong> <code>pytest -q -p no:randomly tasks/*/tests</code> then <code>python3 tasks/site-shift-meter/solution/train_and_eval.py</code>.</p>",
+  "title": "When the delta is fake: Pass-bar design for agent evaluation",
+  "description": "<p>Technical note on pass-bar design for agent-evaluation tasks. Releases three public tasks covering event-sourced repair, systems contracts, and distribution-shift reporting. Each task includes named starter failure modes, an oracle solution, and a verifier that recomputes scores from artifacts rather than trusting self-reported fields.</p><p>Includes a distribution-shift case study (ranking AUROC invariance under mean-only shift; train-site label shortcut that flips at evaluation) and a scored staged-fail transcript with an explicit positive/negative rubric.</p><p>Positioned relative to Terminal-Bench, Harbor, and Inspect. Synthetic fixtures. Methodological scope; not a model leaderboard.</p><p><strong>Reproduction:</strong> <code>pytest -q -p no:randomly tasks/*/tests</code>; <code>python3 tasks/site-shift-meter/solution/train_and_eval.py</code>.</p>",
   "upload_type": "publication",
   "publication_type": "technicalnote",
   "access_right": "open",
   "license": "mit-license",
   "language": "eng",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "creators": [
     {
       "name": "Mayank, Gyanu",
-      "affiliation": "National Institute of Technology Patna"
+      "affiliation": "Independent Researcher; National Institute of Technology Patna"
     }
   ],
   "keywords": [
     "agent evaluation",
+    "evaluation methodology",
     "AI agents",
     "benchmark design",
+    "pass criteria",
     "Terminal-Bench",
     "Harbor",
     "Inspect",
     "distribution shift",
     "AUROC",
-    "trace review",
-    "software testing"
+    "trace analysis",
+    "software verification"
   ],
   "related_identifiers": [
     {
@@ -39,5 +41,5 @@
       "scheme": "doi"
     }
   ],
-  "notes": "Author: Gyanu Mayank (B.Tech CSE, NIT Patna; Pune, India). Contact: gyanumayank0@gmail.com. Prefer the concept DOI https://doi.org/10.5281/zenodo.23829461 when citing (resolves to the latest version)."
+  "notes": "Independent researcher. B.Tech, Computer Science and Engineering, National Institute of Technology Patna. Contact: gyanumayank0@gmail.com. Prefer concept DOI https://doi.org/10.5281/zenodo.23829461 when citing."
 }

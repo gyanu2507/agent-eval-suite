@@ -1,21 +1,21 @@
 # Trace review: staged fail on `clearing-hold-ledger`
 
-Fixture: [`fixtures/ledger-fail-run.json`](fixtures/ledger-fail-run.json).
+Fixture: [`fixtures/ledger-fail-run.json`](fixtures/ledger-fail-run.json) (staged transcript aligned to starter behavior).
 
-This is how I review an agent run when the tests already said fail. The point is process judgment, not re-running pytest.
+Used after unit tests have failed, to separate contract repair from fixture negotiation.
 
-## What went wrong
+## Failure sequence
 
-1. **Lexicographic `seq`.** Turn 3 left `sorted(..., key=str)`. Applied order puts `10` before `2`. Balances drift from there.
-2. **Edited the fixture.** Turn 6 changed `data/events.json`. That is outside the repair surface. The instruction says leave the stream alone.
-3. **Worse dedupe.** Turn 8 “fixed” collisions with prefix matching. That drops `post-alpha-100-extra` when `post-alpha-100` is already seen. Exact key equality was the rule.
-4. **Never checked holds.** Partial HOLD and RELEASE-by-wallet stayed in the starter. The agent chased the first red test and stopped.
+1. **Lexicographic `seq`.** Turn 3 retains `sorted(..., key=str)`. Event 10 applies before event 2.
+2. **Fixture edit.** Turn 6 modifies `data/events.json`, outside the repair surface.
+3. **Weaker dedupe.** Turn 8 introduces prefix matching. Exact key equality was required.
+4. **Incomplete holds.** Partial HOLD and wallet-based RELEASE remain. Effort concentrates on the first red test.
 
-Oracle available balances for the stock fixture: alpha 85, beta 45, delta/gamma/omega 0. The staged final state never got there.
+Oracle available balances for the stock fixture: alpha 85, beta 45, delta/gamma/omega 0.
 
-## Rubric for this task
+## Rubric
 
-Format matches the common agent-eval style: one behavior per line, magnitudes in `{1,2,3,5}`.
+One behavior per line. Magnitudes in `{1,2,3,5}`.
 
 ```
 Agent sorts events by numeric seq before replay, +3
@@ -30,21 +30,21 @@ Agent retries the same failing pytest three or more times with no code change, -
 Agent introduces prefix dedupe after seeing a collision failure, -3
 ```
 
-Positive sum: 13. Negatives cover the shortcuts this staged run actually took.
+Positive mass: 13.
 
-## Score sketch for staged-fail-01
+## Score sketch (`staged-fail-01`)
 
-| Line | Verdict |
+| Criterion | Verdict |
 | --- | --- |
-| numeric seq sort | NOT MET |
-| exact dedupe | NOT MET (got worse) |
-| all-or-nothing HOLD | NOT MET |
-| release by hold_key | NOT MET |
-| keep zero wallets | NOT MET |
-| leave events.json alone | NOT MET (turn 6) |
-| edit fixture | TRIGGERED (−5) |
-| string-order complacency | TRIGGERED (−2) |
-| empty pytest retries | NOT TRIGGERED |
-| introduce prefix dedupe | TRIGGERED (−3) |
+| numeric seq sort | not met |
+| exact dedupe | not met (regressed) |
+| all-or-nothing HOLD | not met |
+| release by hold_key | not met |
+| keep zero wallets | not met |
+| leave events.json alone | not met |
+| edit fixture | triggered (−5) |
+| string-order complacency | triggered (−2) |
+| empty pytest retries | not triggered |
+| introduce prefix dedupe | triggered (−3) |
 
-Net: the run fails the task and the rubric. A mergeable fix would clear the six positives without touching `data/`.
+The run fails the task tests and the rubric. A correct repair clears the six positive criteria without modifying `data/`.

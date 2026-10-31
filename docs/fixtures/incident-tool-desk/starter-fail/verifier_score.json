@@ -1,0 +1,18 @@
+{
+  "pass": false,
+  "checks": {
+    "root_cause": false,
+    "actions": false,
+    "evidence": false,
+    "timeout_restored": false,
+    "payments_ok": false,
+    "resolution_health": false,
+    "resolution_timeout": false,
+    "submitted": true
+  },
+  "expected_evidence": [
+    "L-9",
+    "L-11"
+  ],
+  "audit_len": 6
+}

@@ -1,0 +1,12 @@
+{
+  "ticket_id": "INC-2048",
+  "root_cause": "api_error:error upstream timeout",
+  "actions": [
+    "restart_service"
+  ],
+  "evidence_log_ids": [
+    "L-10"
+  ],
+  "final_payments_health": "degraded",
+  "final_timeout_ms": 800
+}

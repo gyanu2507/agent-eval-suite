@@ -19,8 +19,9 @@
 | [`site-shift-meter`](tasks/site-shift-meter) | Primary construction: fake delta vs shortcut-flip + frozen control |
 | [`clearing-hold-ledger`](tasks/clearing-hold-ledger) | Artifact-backed replay; fixture edits and loose dedupe fail |
 | [`slot-ring-buffer`](tasks/slot-ring-buffer) | Contract not implied by weaker single-consumer greens |
+| [`incident-tool-desk`](tasks/incident-tool-desk) | Long-horizon tools + clock; audit replay; text judge false green |
 
-Each task: named starter failure, oracle, tests, `CALIBRATION.md`. Trace rubric: [docs/trace-review.md](docs/trace-review.md).
+Each task: named starter failure, oracle, tests, `CALIBRATION.md`. Trace rubric: [docs/trace-review.md](docs/trace-review.md). Judge vs verifier: [docs/judge-vs-verifier.md](docs/judge-vs-verifier.md). SFT export: [experiments/sft/](experiments/sft/).
 
 ## Pass-bar
 
@@ -32,7 +33,9 @@ Nop failure · oracle success · verifier recomputes score from artifacts · cal
 pytest -q -p no:randomly tasks/site-shift-meter/tests
 pytest -q -p no:randomly tasks/clearing-hold-ledger/tests
 pytest -q -p no:randomly tasks/slot-ring-buffer/tests
+pytest -q -p no:randomly tasks/incident-tool-desk/tests
 python3 tasks/site-shift-meter/solution/train_and_eval.py
+python3 experiments/sft/export_trajectories.py
 ```
 
 ## Ecosystem

@@ -1,0 +1,30 @@
+{
+  "ticket": {
+    "id": "INC-2048",
+    "title": "checkout latency spike",
+    "opened_ts": 1000,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {"status": "up", "restart_settle_sec": 2},
+    "payments": {"status": "degraded", "restart_settle_sec": 5},
+    "worker": {"status": "up", "restart_settle_sec": 3}
+  },
+  "config": {
+    "payments.timeout_ms": 800,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 5000,
+    "api.retries": 2
+  },
+  "logs": [
+    {"id": "L-10", "service": "api", "ts": 1005, "msg": "error upstream timeout"},
+    {"id": "L-2", "service": "api", "ts": 1002, "msg": "warn slow handler"},
+    {"id": "L-11", "service": "payments", "ts": 1008, "msg": "error timeout budget exhausted"},
+    {"id": "L-9", "service": "payments", "ts": 1007, "msg": "warn timeout_ms=800 below SLO"},
+    {"id": "L-20", "service": "worker", "ts": 1010, "msg": "info queue lag normal"},
+    {"id": "L-3", "service": "api", "ts": 1012, "msg": "error payments gateway 504"}
+  ],
+  "clock_start": 1000
+}

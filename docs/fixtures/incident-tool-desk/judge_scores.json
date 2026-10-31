@@ -1,0 +1,15 @@
+{
+  "rubric": [
+    "root_cause == config_drift:payments.timeout_ms",
+    "actions include set_config and restart_service",
+    "evidence_log_ids == [L-9, L-11]",
+    "final_payments_health == ok",
+    "final_timeout_ms == 5000"
+  ],
+  "threshold": 4,
+  "traces": {
+    "oracle-pass": {"judge_score": 5, "judge_pass": true, "verifier_pass": true},
+    "starter-fail": {"judge_score": 0, "judge_pass": false, "verifier_pass": false},
+    "premature-submit": {"judge_score": 5, "judge_pass": true, "verifier_pass": false}
+  }
+}

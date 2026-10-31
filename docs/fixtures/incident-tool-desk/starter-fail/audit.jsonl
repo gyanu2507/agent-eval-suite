@@ -1,0 +1,6 @@
+{"args": {"ticket_id": "INC-2048"}, "result": {"id": "INC-2048", "opened_ts": 1000, "service_hint": "api", "title": "checkout latency spike"}, "tool": "get_ticket", "ts": 1000}
+{"args": {"service": "api", "since_ts": 1000}, "result": [{"id": "L-10", "msg": "error upstream timeout", "service": "api", "ts": 1005}, {"id": "L-2", "msg": "warn slow handler", "service": "api", "ts": 1002}, {"id": "L-3", "msg": "error payments gateway 504", "service": "api", "ts": 1012}], "tool": "get_logs", "ts": 1000}
+{"args": {"service": "api"}, "result": {"ok": true, "ready_at": 1002}, "tool": "restart_service", "ts": 1000}
+{"args": {"seconds": 1}, "result": {"now": 1001}, "tool": "advance_clock", "ts": 1001}
+{"args": {"service": "api"}, "result": {"ready_at": 1002, "status": "restarting"}, "tool": "health", "ts": 1001}
+{"args": {"actions": ["restart_service"], "evidence_log_ids": ["L-10"], "root_cause": "api_error:error upstream timeout", "ticket_id": "INC-2048"}, "result": {"accepted": true, "actions": ["restart_service"], "evidence_log_ids": ["L-10"], "final_payments_health": "degraded", "final_timeout_ms": 800, "root_cause": "api_error:error upstream timeout", "submitted_at": 1001, "ticket_id": "INC-2048"}, "tool": "submit_resolution", "ts": 1001}

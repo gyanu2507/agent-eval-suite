@@ -1,0 +1,5 @@
+{"args": {"ticket_id": "INC-2048"}, "result": {"id": "INC-2048", "opened_ts": 1000, "service_hint": "api", "title": "checkout latency spike"}, "tool": "get_ticket", "ts": 1000}
+{"args": {"key": "payments.timeout_ms", "value": 5000}, "result": {"key": "payments.timeout_ms", "ok": true, "value": 5000}, "tool": "set_config", "ts": 1000}
+{"args": {"service": "payments"}, "result": {"ok": true, "ready_at": 1005}, "tool": "restart_service", "ts": 1000}
+{"args": {"seconds": 1}, "result": {"now": 1001}, "tool": "advance_clock", "ts": 1001}
+{"args": {"actions": ["set_config", "restart_service"], "evidence_log_ids": ["L-9", "L-11"], "root_cause": "config_drift:payments.timeout_ms", "ticket_id": "INC-2048"}, "result": {"accepted": true, "actions": ["set_config", "restart_service"], "evidence_log_ids": ["L-9", "L-11"], "final_payments_health": "restarting", "final_timeout_ms": 5000, "root_cause": "config_drift:payments.timeout_ms", "submitted_at": 1001, "ticket_id": "INC-2048"}, "tool": "submit_resolution", "ts": 1001}

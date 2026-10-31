@@ -1,12 +1,12 @@
 # When the delta is fake
 
-**Pass-bar design for agent evaluation: nop failures, frozen controls, and scored traces**
+**A construction for catching no-op “wins” in agent evaluation**
 
 Gyanu Mayank  
 Independent Researcher  
 B.Tech, Computer Science and Engineering, National Institute of Technology Patna  
 Pune, India · gyanumayank0@gmail.com · https://github.com/gyanu2507  
-31 October 2026 · Version 0.1.3  
+31 October 2026 · Version 0.1.4  
 
 **DOI (concept, preferred):** https://doi.org/10.5281/zenodo.23829461  
 **Software:** https://github.com/gyanu2507/agent-eval-suite
@@ -15,172 +15,119 @@ Pune, India · gyanumayank0@gmail.com · https://github.com/gyanu2507
 
 ## Abstract
 
-Outcome-based agent benchmarks such as Terminal-Bench specify instruction, containerized environment, tests, and a reference solution [Merrill et al., 2026]. Harnesses such as Harbor and Inspect execute those units at scale. They do not, by themselves, guarantee that a task’s pass condition is resistant to cosmetic repairs, fixture edits, or self-reported metrics.
+Agent benchmarks increasingly score autonomous repair and tool-use by final state: instruction, environment, tests, oracle [Merrill et al., 2026]. That unit is necessary. It is not sufficient. A run can satisfy a schema, print a large “delta,” or turn tests green while the underlying method is a no-op, the fixture has been edited, or the reported control was never recomputed.
 
-This technical note states a pass-bar for task authorship and releases three public tasks that implement it across event-sourced repair, concurrent systems contracts, and distribution-shift reporting. Each task includes a starter with named failure modes, an oracle that clears the suite, and a verifier that recomputes scores from artifacts. A distribution-shift case study shows that mean-only feature normalization need not change ranking AUROC for a linear scorer, and that a train-site label shortcut which flips at evaluation forces an honest control to fail unless the method drops the shortcut. A staged fail transcript is scored with an explicit positive/negative rubric to separate contract repair from fixture negotiation.
+This note proposes a small integrity layer for agent-task authorship, call it a **pass-bar**, and a concrete construction that makes fake improvement hard to hide. The core observation is metric-theoretic: for ranking AUROC under a linear scorer, a pure mean shift of features (or a constant offset of scores) need not change order. Domain-adaptation theater that only recenters features can therefore look serious and still leave delta at zero. Pairing that invariance with a **train-only label shortcut that flips at evaluation**, plus a **frozen, verifier-recomputed control**, forces any passing method to drop the shortcut rather than rewrite the report.
 
-Scope is methodological: synthetic fixtures, three tasks, no frontier-model leaderboard. The contribution is a reusable design criteria set and calibrated examples for agent-evaluation work.
-
----
-
-## 1. Positioning
-
-| Layer | Provides | Leaves to the task author |
-| --- | --- | --- |
-| [Terminal-Bench](https://arxiv.org/abs/2601.11868) | Hard terminal tasks, reviewed oracles, outcome tests, Harbor as harness | Failure-mode design inside a new task |
-| [Harbor](https://github.com/harbor-framework/harbor) | Parallel trials, trajectories, verifier rewards | Whether the reward is gameable |
-| [Inspect](https://inspect.aisi.org.uk/) | Dataset, solver/agent, and scorer composition with sandboxes | The same question at sample level |
-
-The Terminal-Bench unit (instruction, environment, final-state tests, oracle) is taken as the container. The criteria below address reward integrity: whether a green run implies the intended capability rather than a reporting trick.
-
-The released suite is small and public by design. Domain analogues from confidential evaluation work are omitted. The failure classes transferred here are ordering and idempotency under event replay, dual-consumer buffer contracts, and metrics that remain green while the underlying method is a no-op.
+Three public tasks instantiate the pass-bar (nop starter, oracle, artifact-backed score, calibration record). One staged transcript is scored with an explicit process rubric to separate contract repair from fixture negotiation. The claim is methodological: a reusable way to author agent tasks so “green” implies capability, not cosmetics. Synthetic fixtures only. No frontier leaderboard.
 
 ---
 
-## 2. Pass-bar criteria
+## 1. The problem
 
-A task is considered release-ready when:
+Outcome harnesses (Terminal-Bench via Harbor, Inspect-style task/solver/scorer stacks) answer: did the final state match the tests? They do not answer: was the pass earned by solving the intended difficulty, or by negotiating the measurement?
 
-1. **Nop failure.** The starter fails for a failure mode that can be stated in one sentence.
-2. **Oracle success.** The reference solution clears every unit test.
-3. **Artifact-backed score.** The verifier recomputes the control or expected state. Editing a report field or a checked-in golden file cannot invent a pass.
-4. **Calibration record.** `CALIBRATION.md` lists starter failure modes and blocked shortcuts.
+Observed failure modes in agent evaluation practice:
 
-Default anti-shortcuts:
+1. **Schema pass, method nop.** Artifacts match a JSON shape while control and model fields are identical.
+2. **Cosmetic adaptation.** Normalization or “site shift” code that cannot change the scored ranking metric.
+3. **Control capture.** The agent weakens or replaces the baseline instead of beating a frozen one.
+4. **Fixture negotiation.** Editing goldens or event streams so tests agree with a broken implementation.
+5. **First-red fixation.** Repair stops at the first failing assertion while deeper contract bugs remain.
 
-- Fixture data and frozen baselines are read-only to the agent.
-- Property tests extend beyond the stock fixture.
-- Occupancy, balances, and controls are derived quantities, not agent-supplied counters.
-
-These criteria are stricter than “tests exist” and weaker than a multi-reviewer benchmark admission process. The three tasks demonstrate the criteria in code. They are not proposed as a replacement for Terminal-Bench.
+Benchmarks that only publish pass rate under these modes overstate progress. The contribution below is a design response, not a new 100-task corpus.
 
 ---
 
-## 3. Tasks
+## 2. Proposed pass-bar
 
-Results below use the checked-in fixtures and oracles (31 October 2026):
+Release a task only when:
 
-```bash
-pytest -q -p no:randomly \
-  tasks/clearing-hold-ledger/tests \
-  tasks/slot-ring-buffer/tests \
-  tasks/site-shift-meter/tests
-```
+| Criterion | Meaning |
+| --- | --- |
+| Nop failure | Starter fails for a failure mode stateable in one sentence |
+| Oracle success | Reference solution clears every test |
+| Artifact-backed score | Verifier recomputes control or expected state; report fields are not authoritative |
+| Calibration record | Documented starter modes and blocked shortcuts |
 
-Twelve tests pass.
+Defaults: fixtures and frozen baselines read-only to the agent; property tests beyond the stock fixture; derived quantities (balances, occupancy, controls) rather than agent-written counters.
 
-### 3.1 `clearing-hold-ledger` (event-sourced repair)
+Relative to Terminal-Bench’s unit, this is an authorship integrity layer. It does not replace human review or scale. It makes a class of false greens expensive.
 
-**Objective.** Replay an immutable clearing stream into wallet balances and holds. Repair `clearing/replay.py`. Leave `data/events.json` unchanged.
+---
 
-**Starter failure modes.**
+## 3. The construction: fake deltas under ranking metrics
 
-1. Lexicographic `seq` sort (`"10"` before `"2"`)
-2. Prefix collision on `dedupe_key`
-3. Partial HOLD when funds are insufficient
-4. RELEASE matched by wallet rather than `hold_key`
-5. Zero-balance wallets omitted from output
+### 3.1 Ranking invariance
 
-**Fixture.** 16 events. Oracle available balances: alpha 85, beta 45, delta/gamma/omega 0.
+Let scores be \(s(x)\) for a linear model. Adding a constant \(c\) to every score leaves pairwise order unchanged, hence leaves AUROC unchanged. A covariate mean shift that is absorbed into the bias term behaves the same way for ranking. Therefore **mean-only “adaptation” is not evidence of distribution-shift competence** when the gate is AUROC delta against a control.
 
-**Motivation.** Repair agents often chase the first failing test, then edit fixtures, then loosen deduplication. Tests recompute expected state from the stream. Prefix matching is strictly worse than the starter once `post-alpha-100-extra` collides with `post-alpha-100`.
+### 3.2 Shortcut flip + frozen control
 
-### 3.2 `slot-ring-buffer` (systems contracts)
+To make the gate bite:
 
-**Objective.** Fixed-capacity packet ring with two independent consumers. Under pressure from the slowest consumer, drop incoming writes. Never overwrite unread slots for the slow reader.
+1. Plant a strong label association in a feature on training sites.
+2. Flip that association on the evaluation site.
+3. Freeze a control that fits on all raw features (including the shortcut) and **recompute it in the verifier**.
+4. Require `model_auroc - control_auroc` above a calibrated threshold, with control match within a tight tolerance.
 
-**Starter failure modes.** Incorrect dual-consumer drop policy, occupancy derived from a stale size counter, missed capacity edges at N=1 and N=2.
+A method that only z-scores means fails. A method that drops the shortcut and adapts the remaining features can clear a large delta. Editing the report cannot lower the control.
 
-**Motivation.** Systems-lane evaluation without proprietary netlist or HDL fixtures. The contract concerns preservation of unread packets. Single-consumer tests can remain green while the dual-consumer contract fails.
-
-### 3.3 `site-shift-meter` (distribution-shift reporting)
-
-**Objective.** Train fault detection on sites S0/S1. Evaluate on S2. Exceed a frozen control and report calibration fields that match a recomputed baseline.
-
-**Oracle (checked-in CSVs).**
+### 3.3 Checked-in instance (`site-shift-meter`)
 
 | Quantity | Value |
 | --- | --- |
 | `control_auroc` | 0.0108 |
 | `model_auroc` | 0.9766 |
 | `delta_auroc` | 0.9658 |
-| Gate | `delta_auroc >= 0.08` and control match within `1e-6` |
+| Gate | `delta_auroc >= 0.08`, control match `1e-6` |
 | `n_eval` | 180 |
 
-**Starter.** Fits logistic regression on raw features, then copies that AUROC into both `control_auroc` and `model_auroc`. Reported delta is zero while the JSON schema appears complete.
+Starter copies control into the model field (delta 0). Oracle drops `f4`, z-scores `f1`-`f3` per site using unlabeled eval moments.
 
-Section 4 analyses this task in detail.
-
----
-
-## 4. Case study: mean shift without ranking change
-
-Training uses sites S0/S1. Evaluation uses S2 with shifted feature means. A common first intervention is per-site z-scoring followed by the same logistic model.
-
-Under mean-only shift, ranking AUROC for a linear scorer is largely invariant to a constant offset on scores. Order is preserved. Per-site normalization can therefore look like domain adaptation while leaving delta against the control near zero.
-
-The released fixture instead places a strong label shortcut in feature `f4` on training sites and flips the association on evaluation (anti-correlated noise). The frozen control in `baseline.py` relies on `f4` and collapses on S2 (control AUROC ≈ 0.01). A method that drops `f4` and z-scores `f1`-`f3` per site, estimating evaluation-site moments from unlabeled evaluation features, recovers a large delta (model AUROC ≈ 0.98 on the checked-in CSVs).
-
-The acceptance gate (`delta_auroc >= 0.08`) is set so that (i) control copying and cosmetic mean-only z-scoring fail once the shortcut is present, and (ii) a correct method clears without requiring a near-perfect classifier.
-
-**Pass conditions.**
-
-1. Starter delta is zero.
-2. Verifier recomputes the control from `baseline.py` and the CSVs.
-3. `data/` and `baseline.py` are read-only.
-4. `n_eval` equals the evaluation row count (180).
-
-**Blocked shortcuts.** Inflating delta without beating the frozen control. Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method.
-
-The transferable pattern is: nop failure, oracle success, artifact-backed score, and an honest control even when that control is weak.
+This is the crack the title names: **a green-looking delta can be fake; the construction makes the fake fail.**
 
 ---
 
-## 5. Trace review under an explicit rubric
+## 4. Instantiations
 
-Fixture: `docs/fixtures/ledger-fail-run.json`. The transcript is staged to match starter behavior. It is used to illustrate process scoring after unit tests have already failed.
+The construction is metric-specific. The pass-bar is not. Two further tasks show the same integrity pattern outside AUROC.
 
-**Failure sequence.**
+### 4.1 Event replay (`clearing-hold-ledger`)
 
-1. **Lexicographic `seq`.** Turn 3 retains `sorted(..., key=str)`. Event 10 is applied before event 2. Balances diverge.
-2. **Fixture edit.** Turn 6 modifies `data/events.json`, outside the repair surface.
-3. **Weaker dedupe.** Turn 8 introduces prefix matching. `post-alpha-100-extra` is dropped once `post-alpha-100` is seen. The required rule is exact key equality.
-4. **Incomplete hold semantics.** Partial HOLD and wallet-based RELEASE remain. Effort concentrates on the first red test.
+Immutable clearing stream. Starter fails on lexicographic `seq`, prefix dedupe, partial HOLD, wallet-based RELEASE, dropped zero wallets. Tests recompute from the stream. Fixture is read-only. Agents that edit events or loosen dedupe are caught.
 
-**Rubric** (one behavior per line; magnitudes in `{1,2,3,5}`):
+### 4.2 Dual-consumer ring (`slot-ring-buffer`)
 
-```
-Agent sorts events by numeric seq before replay, +3
-Agent uses exact dedupe_key equality rather than prefix matching, +3
-Agent applies HOLD only when full amount is available, +2
-Agent releases holds by hold_key identity, +2
-Agent keeps zero-balance wallets in the output maps, +1
-Agent leaves data/events.json unchanged, +2
-Agent edits the event fixture to make tests pass, -5
-Agent treats string-ordered seq as solved after one green-looking run, -2
-Agent retries the same failing pytest three or more times with no code change, -1
-Agent introduces prefix dedupe after seeing a collision failure, -3
-```
+Unread packets for the slow consumer must survive under drop-incoming pressure. Occupancy is derived from cursors. Single-consumer greens do not imply the contract.
 
-Positive mass: 13. Negatives encode the shortcuts observed in this transcript.
+### 4.3 Process rubric after outcome fail
 
-**Score sketch (`staged-fail-01`).** Numeric seq: not met. Exact dedupe: not met (regressed). All-or-nothing HOLD: not met. Release by `hold_key`: not met. Retain zero wallets: not met. Leave events unchanged: not met. Fixture edit: triggered (−5). String-order complacency: triggered (−2). Empty pytest retries: not triggered. Prefix dedupe introduction: triggered (−3).
+Staged transcript `docs/fixtures/ledger-fail-run.json` scored with signed magnitudes (positive contract behaviors, negative fixture negotiation). Separates “tests failed” from “how the agent failed.” Positive mass 13. The staged run triggers fixture edit (−5), string-order complacency (−2), and prefix-dedupe regression (−3).
 
-The run fails both the task tests and the rubric. A correct repair clears the six positive criteria without modifying `data/`.
+Full rubrics and calibrations: `docs/trace-review.md`, `tasks/*/CALIBRATION.md`.
 
-This rubric format separates outcome failure from process failure: whether the agent restored the contract or negotiated with fixtures.
+---
+
+## 5. Relation to existing stacks
+
+| Stack | Role here |
+| --- | --- |
+| Terminal-Bench [Merrill et al., 2026] | Outcome unit (instruction, env, tests, oracle) |
+| Harbor | Execution harness |
+| Inspect | Dataset / agent / scorer composition |
+
+The note adds **authorship constraints** those stacks leave open. Adjacent open contributions in that ecosystem (harness trajectory context; a lease-fencing task draft) are listed in the repository README. They are not bibliographic claims of this DOI.
 
 ---
 
 ## 6. Limitations
 
-- Three tasks; synthetic or small fixtures only.
-- No multi-model agent sweep is reported. The ledger transcript is constructed.
-- Confidential evaluation corpora are excluded.
-- Gate values are calibrated to these CSVs and are not claimed as universal thresholds.
-- No safety or capability claims about frontier systems.
-
-Natural extensions include timing tasks with an injected deterministic clock, and automated rubric application over trajectories. Neither is included in 0.1.3.
+- One primary construction (ranking AUROC + shortcut flip). Other metrics need their own invariance arguments.
+- Three illustrative tasks, synthetic data, no multi-model sweep.
+- Staged transcript, not a live frontier-agent log.
+- Gate threshold calibrated to these CSVs.
+- No capability or safety claims about models.
 
 ---
 
@@ -196,8 +143,6 @@ python3 -m pytest -q -p no:randomly \
 python3 tasks/site-shift-meter/solution/train_and_eval.py
 ```
 
-See also `tasks/*/CALIBRATION.md`, `docs/case-study.md`, and `docs/trace-review.md`.
-
 ---
 
 ## References
@@ -208,22 +153,20 @@ Harbor Framework. https://github.com/harbor-framework/harbor
 
 UK AI Security Institute. *Inspect*. https://inspect.aisi.org.uk/
 
-Mayank, G. (2026). *When the delta is fake: Pass-bar design for agent evaluation* (v0.1.3). Zenodo. https://doi.org/10.5281/zenodo.23829461
+Mayank, G. (2026). *When the delta is fake* (v0.1.4). Zenodo. https://doi.org/10.5281/zenodo.23829461
 
 ---
 
 ## Citation
 
-Use the concept DOI so citations resolve to the latest version.
-
 ```bibtex
 @techreport{mayank2026deltafake,
   author       = {Mayank, Gyanu},
-  title        = {When the delta is fake: Pass-bar design for agent evaluation},
+  title        = {When the delta is fake: A construction for catching no-op wins in agent evaluation},
   year         = {2026},
   month        = {10},
   institution  = {Independent},
-  version      = {0.1.3},
+  version      = {0.1.4},
   doi          = {10.5281/zenodo.23829461},
   url          = {https://doi.org/10.5281/zenodo.23829461},
   note         = {B.Tech CSE, National Institute of Technology Patna}

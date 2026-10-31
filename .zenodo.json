@@ -1,12 +1,12 @@
 {
-  "title": "When the delta is fake: Pass-bar design for agent evaluation",
-  "description": "<p>Technical note on pass-bar design for agent-evaluation tasks. Releases three public tasks covering event-sourced repair, systems contracts, and distribution-shift reporting. Each task includes named starter failure modes, an oracle solution, and a verifier that recomputes scores from artifacts rather than trusting self-reported fields.</p><p>Includes a distribution-shift case study (ranking AUROC invariance under mean-only shift; train-site label shortcut that flips at evaluation) and a scored staged-fail transcript with an explicit positive/negative rubric.</p><p>Positioned relative to Terminal-Bench, Harbor, and Inspect. Synthetic fixtures. Methodological scope; not a model leaderboard.</p><p><strong>Reproduction:</strong> <code>pytest -q -p no:randomly tasks/*/tests</code>; <code>python3 tasks/site-shift-meter/solution/train_and_eval.py</code>.</p>",
+  "title": "When the delta is fake: A construction for catching no-op wins in agent evaluation",
+  "description": "<p>Technical note proposing an integrity layer (pass-bar) for agent-evaluation task authorship, and a concrete construction that makes fake improvement hard to hide.</p><p><strong>Claim.</strong> For ranking AUROC under a linear scorer, pure mean shift / constant score offset need not change order. Mean-only adaptation can therefore look like distribution-shift competence while leaving delta at zero. Pairing that invariance with a train-only label shortcut that flips at evaluation, plus a frozen control recomputed by the verifier, forces passing methods to drop the shortcut rather than rewrite the report.</p><p>Three reference tasks instantiate the pass-bar (nop starter, oracle, artifact-backed score, calibration). Includes a scored staged-fail rubric. Positioned relative to Terminal-Bench, Harbor, and Inspect. Synthetic fixtures. Methodological contribution; not a model leaderboard.</p>",
   "upload_type": "publication",
   "publication_type": "technicalnote",
   "access_right": "open",
   "license": "mit-license",
   "language": "eng",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "creators": [
     {
       "name": "Mayank, Gyanu",
@@ -15,17 +15,16 @@
   ],
   "keywords": [
     "agent evaluation",
-    "evaluation methodology",
-    "AI agents",
+    "evaluation integrity",
     "benchmark design",
     "pass criteria",
+    "AUROC",
+    "distribution shift",
+    "no-op failure",
     "Terminal-Bench",
     "Harbor",
     "Inspect",
-    "distribution shift",
-    "AUROC",
-    "trace analysis",
-    "software verification"
+    "trace analysis"
   ],
   "related_identifiers": [
     {
@@ -41,5 +40,5 @@
       "scheme": "doi"
     }
   ],
-  "notes": "Independent researcher. B.Tech, Computer Science and Engineering, National Institute of Technology Patna. Contact: gyanumayank0@gmail.com. Prefer concept DOI https://doi.org/10.5281/zenodo.23829461 when citing."
+  "notes": "Independent researcher. B.Tech CSE, National Institute of Technology Patna. Contact: gyanumayank0@gmail.com. Prefer concept DOI https://doi.org/10.5281/zenodo.23829461."
 }

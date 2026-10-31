@@ -1,6 +1,6 @@
-# Case study: mean shift without ranking change
+# Construction instance: mean shift without ranking change
 
-Full writeup: [tech report](tech-report.md) ([DOI](https://doi.org/10.5281/zenodo.23829461)).
+Primary claim of the [tech report](tech-report.md) ([DOI](https://doi.org/10.5281/zenodo.23829461)): fake deltas under ranking AUROC, caught by shortcut flip + frozen control.
 
 Task: `site-shift-meter`. Train on sites S0/S1, evaluate on S2.
 

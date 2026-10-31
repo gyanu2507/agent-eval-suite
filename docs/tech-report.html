@@ -24,121 +24,100 @@
   th, td { border: 1px solid var(--rule); padding: 0.3rem 0.45rem; text-align: left; vertical-align: top; }
   th { background: #ebe7df; font-weight: 600; }
   pre, code { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 8.2pt; }
-  pre { background: #efece5; border: 1px solid var(--rule); padding: 0.55rem 0.65rem; overflow-x: auto; line-height: 1.32; margin: 0.4rem 0 0.75rem; white-space: pre-wrap; }
+  pre { background: #efece5; border: 1px solid var(--rule); padding: 0.55rem 0.65rem; line-height: 1.32; margin: 0.4rem 0 0.75rem; white-space: pre-wrap; }
   code { background: #efece5; padding: 0.05rem 0.2rem; }
   pre code { background: none; padding: 0; }
   .abstract { font-size: 9.7pt; border-left: 3px solid var(--accent); padding-left: 0.75rem; margin: 0.85rem 0 1.2rem; }
   .abstract-label { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); display: block; margin-bottom: 0.3rem; }
+  .crack { font-family: "IBM Plex Sans", sans-serif; font-size: 9.5pt; background: #e8efe9; border: 1px solid #b7c9bc; padding: 0.55rem 0.7rem; margin: 0.7rem 0 1rem; }
   .refs p { font-size: 9pt; margin-bottom: 0.35rem; }
   @media print { body { background: white; padding: 0; max-width: none; } }
 </style>
 </head>
 <body>
 <h1>When the delta is fake</h1>
-<p class="subtitle">Pass-bar design for agent evaluation: nop failures, frozen controls, and scored traces</p>
+<p class="subtitle">A construction for catching no-op “wins” in agent evaluation</p>
 <div class="meta">
   <div><strong>Gyanu Mayank</strong> · Independent Researcher</div>
   <div>B.Tech, Computer Science and Engineering, National Institute of Technology Patna</div>
   <div>Pune, India · gyanumayank0@gmail.com · github.com/gyanu2507</div>
-  <div>31 October 2026 · v0.1.3</div>
+  <div>31 October 2026 · v0.1.4</div>
   <div>DOI (concept): <a href="https://doi.org/10.5281/zenodo.23829461">10.5281/zenodo.23829461</a></div>
   <div>Software: <a href="https://github.com/gyanu2507/agent-eval-suite">github.com/gyanu2507/agent-eval-suite</a></div>
 </div>
 <div class="abstract">
 <span class="abstract-label">Abstract</span>
-<p>Outcome-based agent benchmarks such as Terminal-Bench specify instruction, containerized environment, tests, and a reference solution (Merrill et al., 2026). Harnesses such as Harbor and Inspect execute those units at scale. They do not, by themselves, guarantee that a task’s pass condition is resistant to cosmetic repairs, fixture edits, or self-reported metrics.</p>
-<p>This technical note states a pass-bar for task authorship and releases three public tasks that implement it across event-sourced repair, concurrent systems contracts, and distribution-shift reporting. Each task includes a starter with named failure modes, an oracle that clears the suite, and a verifier that recomputes scores from artifacts. A distribution-shift case study shows that mean-only feature normalization need not change ranking AUROC for a linear scorer, and that a train-site label shortcut which flips at evaluation forces an honest control to fail unless the method drops the shortcut. A staged fail transcript is scored with an explicit positive/negative rubric.</p>
-<p>Scope is methodological: synthetic fixtures, three tasks, no frontier-model leaderboard. The contribution is a reusable design criteria set and calibrated examples for agent-evaluation work.</p>
+<p>Agent benchmarks increasingly score autonomous repair and tool-use by final state: instruction, environment, tests, oracle (Merrill et al., 2026). That unit is necessary. It is not sufficient. A run can satisfy a schema, print a large “delta,” or turn tests green while the underlying method is a no-op, the fixture has been edited, or the reported control was never recomputed.</p>
+<p>This note proposes a small integrity layer for agent-task authorship (a pass-bar) and a concrete construction that makes fake improvement hard to hide. For ranking AUROC under a linear scorer, pure mean shift need not change order. Mean-only adaptation can look serious with delta still zero. Pairing that invariance with a train-only label shortcut that flips at evaluation, plus a frozen verifier-recomputed control, forces any passing method to drop the shortcut rather than rewrite the report.</p>
+<p>Three public tasks instantiate the pass-bar. One staged transcript uses an explicit process rubric. Methodological claim. Synthetic fixtures. No frontier leaderboard.</p>
 </div>
 
-<h2>1. Positioning</h2>
+<div class="crack"><strong>Claim in one line.</strong> A green-looking delta can be fake. Ranking invariance + shortcut flip + frozen recomputed control makes the fake fail.</div>
+
+<h2>1. The problem</h2>
+<p>Outcome harnesses answer: did the final state match the tests? They do not answer: was the pass earned by solving the intended difficulty, or by negotiating the measurement?</p>
+<ol>
+<li><strong>Schema pass, method nop.</strong> Artifacts match a JSON shape while control and model fields are identical.</li>
+<li><strong>Cosmetic adaptation.</strong> Normalization that cannot change the scored ranking metric.</li>
+<li><strong>Control capture.</strong> The agent weakens the baseline instead of beating a frozen one.</li>
+<li><strong>Fixture negotiation.</strong> Editing goldens so tests agree with a broken implementation.</li>
+<li><strong>First-red fixation.</strong> Repair stops at the first failing assertion.</li>
+</ol>
+<p>Benchmarks that only publish pass rate under these modes overstate progress. The contribution is a design response, not a new 100-task corpus.</p>
+
+<h2>2. Proposed pass-bar</h2>
 <table>
-<thead><tr><th>Layer</th><th>Provides</th><th>Leaves to the task author</th></tr></thead>
+<thead><tr><th>Criterion</th><th>Meaning</th></tr></thead>
 <tbody>
-<tr><td>Terminal-Bench</td><td>Hard terminal tasks, reviewed oracles, outcome tests, Harbor as harness</td><td>Failure-mode design inside a new task</td></tr>
-<tr><td>Harbor</td><td>Parallel trials, trajectories, verifier rewards</td><td>Whether the reward is gameable</td></tr>
-<tr><td>Inspect</td><td>Dataset, solver/agent, and scorer composition with sandboxes</td><td>The same question at sample level</td></tr>
+<tr><td>Nop failure</td><td>Starter fails for a failure mode stateable in one sentence</td></tr>
+<tr><td>Oracle success</td><td>Reference solution clears every test</td></tr>
+<tr><td>Artifact-backed score</td><td>Verifier recomputes control or expected state</td></tr>
+<tr><td>Calibration record</td><td>Documented starter modes and blocked shortcuts</td></tr>
 </tbody>
 </table>
-<p>The Terminal-Bench unit (instruction, environment, final-state tests, oracle) is taken as the container. The criteria below address reward integrity: whether a green run implies the intended capability rather than a reporting trick.</p>
-<p>The released suite is small and public by design. Domain analogues from confidential evaluation work are omitted. The failure classes transferred here are ordering and idempotency under event replay, dual-consumer buffer contracts, and metrics that remain green while the underlying method is a no-op.</p>
+<p>Relative to Terminal-Bench’s unit, this is an authorship integrity layer. It makes a class of false greens expensive.</p>
 
-<h2>2. Pass-bar criteria</h2>
+<h2>3. The construction: fake deltas under ranking metrics</h2>
+<h3>3.1 Ranking invariance</h3>
+<p>Adding a constant to every score leaves pairwise order unchanged, hence leaves AUROC unchanged. A covariate mean shift absorbed into the bias behaves the same way for ranking. Mean-only “adaptation” is therefore not evidence of distribution-shift competence when the gate is AUROC delta.</p>
+<h3>3.2 Shortcut flip + frozen control</h3>
 <ol>
-<li><strong>Nop failure.</strong> The starter fails for a failure mode that can be stated in one sentence.</li>
-<li><strong>Oracle success.</strong> The reference solution clears every unit test.</li>
-<li><strong>Artifact-backed score.</strong> The verifier recomputes the control or expected state. Editing a report field or golden file cannot invent a pass.</li>
-<li><strong>Calibration record.</strong> <code>CALIBRATION.md</code> lists starter failure modes and blocked shortcuts.</li>
+<li>Plant a strong label association in a feature on training sites.</li>
+<li>Flip that association on the evaluation site.</li>
+<li>Freeze a control on all raw features and recompute it in the verifier.</li>
+<li>Require model − control above a calibrated threshold with tight control match.</li>
 </ol>
-<p>Default anti-shortcuts: fixture data and frozen baselines are read-only; property tests extend beyond the stock fixture; occupancy, balances, and controls are derived quantities.</p>
-<p>These criteria are stricter than “tests exist” and weaker than a multi-reviewer benchmark admission process. The three tasks demonstrate the criteria in code.</p>
-
-<h2>3. Tasks</h2>
-<p>Checked-in fixtures and oracles, 31 October 2026. Twelve tests pass.</p>
-<pre><code>pytest -q -p no:randomly \
-  tasks/clearing-hold-ledger/tests \
-  tasks/slot-ring-buffer/tests \
-  tasks/site-shift-meter/tests</code></pre>
-
-<h3>3.1 clearing-hold-ledger (event-sourced repair)</h3>
-<p><strong>Objective.</strong> Replay an immutable clearing stream into wallet balances and holds. Repair <code>clearing/replay.py</code>. Leave <code>data/events.json</code> unchanged.</p>
-<p><strong>Starter failure modes.</strong> Lexicographic <code>seq</code> sort; prefix collision on <code>dedupe_key</code>; partial HOLD; RELEASE by wallet rather than <code>hold_key</code>; zero-balance wallets omitted.</p>
-<p><strong>Fixture.</strong> 16 events. Oracle balances: alpha 85, beta 45, delta/gamma/omega 0.</p>
-<p><strong>Motivation.</strong> Repair agents often chase the first failing test, then edit fixtures, then loosen deduplication. Tests recompute expected state from the stream.</p>
-
-<h3>3.2 slot-ring-buffer (systems contracts)</h3>
-<p><strong>Objective.</strong> Fixed-capacity packet ring with two independent consumers. Under pressure from the slowest consumer, drop incoming writes. Never overwrite unread slots for the slow reader.</p>
-<p><strong>Motivation.</strong> Systems-lane evaluation without proprietary netlist fixtures. Single-consumer tests can remain green while the dual-consumer contract fails.</p>
-
-<h3>3.3 site-shift-meter (distribution-shift reporting)</h3>
-<p><strong>Objective.</strong> Train on sites S0/S1. Evaluate on S2. Exceed a frozen control with recomputable calibration.</p>
+<p>Z-score-only methods fail. Methods that drop the shortcut can clear a large delta. Editing the report cannot lower the control.</p>
+<h3>3.3 Checked-in instance (site-shift-meter)</h3>
 <table>
 <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
 <tbody>
 <tr><td><code>control_auroc</code></td><td>0.0108</td></tr>
 <tr><td><code>model_auroc</code></td><td>0.9766</td></tr>
 <tr><td><code>delta_auroc</code></td><td>0.9658</td></tr>
-<tr><td>Gate</td><td><code>delta_auroc &gt;= 0.08</code>; control match within <code>1e-6</code></td></tr>
+<tr><td>Gate</td><td><code>&gt;= 0.08</code>, control match <code>1e-6</code></td></tr>
 <tr><td><code>n_eval</code></td><td>180</td></tr>
 </tbody>
 </table>
-<p><strong>Starter.</strong> Fits logistic regression on raw features, then copies that AUROC into both report fields. Delta is zero while the JSON schema appears complete.</p>
 
-<h2>4. Case study: mean shift without ranking change</h2>
-<p>Under mean-only shift, ranking AUROC for a linear scorer is largely invariant to a constant offset on scores. Per-site normalization can look like domain adaptation while leaving delta near zero.</p>
-<p>The fixture places a strong label shortcut in <code>f4</code> on training sites and flips it on evaluation. The frozen control collapses on S2 (≈0.01 AUROC). Dropping <code>f4</code> and z-scoring <code>f1</code>-<code>f3</code> per site recovers ≈0.98 AUROC on the checked-in CSVs.</p>
-<p>The gate (<code>&gt;= 0.08</code>) rejects control copying and cosmetic mean-only z-scoring once the shortcut is present, while allowing a correct method to pass without a near-perfect classifier.</p>
+<h2>4. Instantiations</h2>
+<p>The construction is metric-specific. The pass-bar is not. Further tasks show the same integrity pattern: event replay with read-only fixtures and recomputed state; dual-consumer ring where single-consumer greens do not imply the contract; a staged fail transcript with signed process rubric (positive mass 13).</p>
 
-<h2>5. Trace review under an explicit rubric</h2>
-<p>Fixture: <code>docs/fixtures/ledger-fail-run.json</code> (staged). Failure sequence: lexicographic <code>seq</code>, fixture edit, prefix dedupe regression, incomplete hold semantics.</p>
-<pre><code>Agent sorts events by numeric seq before replay, +3
-Agent uses exact dedupe_key equality rather than prefix matching, +3
-Agent applies HOLD only when full amount is available, +2
-Agent releases holds by hold_key identity, +2
-Agent keeps zero-balance wallets in the output maps, +1
-Agent leaves data/events.json unchanged, +2
-Agent edits the event fixture to make tests pass, -5
-Agent treats string-ordered seq as solved after one green-looking run, -2
-Agent retries the same failing pytest three or more times with no code change, -1
-Agent introduces prefix dedupe after seeing a collision failure, -3</code></pre>
-<p>Positive mass: 13. The staged run fails tests and rubric. A correct repair clears the six positives without modifying <code>data/</code>. The rubric separates outcome failure from process failure.</p>
+<h2>5. Relation to existing stacks</h2>
+<p>Terminal-Bench provides the outcome unit. Harbor executes. Inspect composes dataset / agent / scorer. This note adds authorship constraints those stacks leave open.</p>
 
 <h2>6. Limitations</h2>
 <ul>
-<li>Three tasks; synthetic or small fixtures only.</li>
-<li>No multi-model agent sweep. The ledger transcript is constructed.</li>
-<li>Confidential evaluation corpora are excluded.</li>
-<li>Gate values are calibrated to these CSVs.</li>
-<li>No safety or capability claims about frontier systems.</li>
+<li>One primary construction (ranking AUROC + shortcut flip).</li>
+<li>Three illustrative tasks, synthetic data, no multi-model sweep.</li>
+<li>Staged transcript. Gate calibrated to these CSVs.</li>
+<li>No capability or safety claims about models.</li>
 </ul>
 
 <h2>7. Reproduction</h2>
 <pre><code>git clone https://github.com/gyanu2507/agent-eval-suite
 cd agent-eval-suite
-python3 -m pytest -q -p no:randomly \
-  tasks/clearing-hold-ledger/tests \
-  tasks/slot-ring-buffer/tests \
-  tasks/site-shift-meter/tests
+python3 -m pytest -q -p no:randomly tasks/*/tests
 python3 tasks/site-shift-meter/solution/train_and_eval.py</code></pre>
 
 <h2>References</h2>
@@ -146,21 +125,20 @@ python3 tasks/site-shift-meter/solution/train_and_eval.py</code></pre>
 <p>Merrill, M. A., Shaw, A. G., Carlini, N., et al. (2026). <em>Terminal-Bench</em>. arXiv:2601.11868. https://doi.org/10.48550/arXiv.2601.11868</p>
 <p>Harbor Framework. https://github.com/harbor-framework/harbor</p>
 <p>UK AI Security Institute. <em>Inspect</em>. https://inspect.aisi.org.uk/</p>
-<p>Mayank, G. (2026). <em>When the delta is fake</em> (v0.1.3). Zenodo. https://doi.org/10.5281/zenodo.23829461</p>
+<p>Mayank, G. (2026). <em>When the delta is fake</em> (v0.1.4). Zenodo. https://doi.org/10.5281/zenodo.23829461</p>
 </div>
 
 <h2>Citation</h2>
-<p>Use the concept DOI so citations resolve to the latest version.</p>
 <pre><code>@techreport{mayank2026deltafake,
   author       = {Mayank, Gyanu},
-  title        = {When the delta is fake: Pass-bar design for agent evaluation},
+  title        = {When the delta is fake: A construction for catching
+                  no-op wins in agent evaluation},
   year         = {2026},
   month        = {10},
   institution  = {Independent},
-  version      = {0.1.3},
+  version      = {0.1.4},
   doi          = {10.5281/zenodo.23829461},
-  url          = {https://doi.org/10.5281/zenodo.23829461},
-  note         = {B.Tech CSE, National Institute of Technology Patna}
+  url          = {https://doi.org/10.5281/zenodo.23829461}
 }</code></pre>
 </body>
 </html>

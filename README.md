@@ -2,12 +2,14 @@
 
 Public samples of how I design agent evaluation tasks. Original code and synthetic data only.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23829461.svg)](https://doi.org/10.5281/zenodo.23829461)
+
 **Tech report:** [When the delta is fake](docs/tech-report.md) ([HTML](docs/tech-report.html), [PDF](docs/tech-report.pdf))  
-**DOI:** [10.5281/zenodo.23829462](https://doi.org/10.5281/zenodo.23829462) · cite via [`CITATION.cff`](CITATION.cff)
+**Cite:** concept DOI [10.5281/zenodo.23829461](https://doi.org/10.5281/zenodo.23829461) · [`CITATION.cff`](CITATION.cff)
 
 Short forms: [case study](docs/case-study.md) (site-shift pass bar), [trace review](docs/trace-review.md) (scored ledger fail).
 
-Companion PRs: [Harbor #4003](https://github.com/harbor-framework/harbor/pull/4003), [Terminal-Bench #2480](https://github.com/harbor-framework/terminal-bench/pull/2480) (`lease-fencing-reaper`).
+Author: Gyanu Mayank · B.Tech CSE, NIT Patna · Pune, India
 
 ## Tasks
 
@@ -30,3 +32,10 @@ pytest -q -p no:randomly tasks/site-shift-meter/tests
 ## Design bar
 
 A task ships when the starter fails for a reason I can name, the oracle passes, the verifier recomputes the score from artifacts, and the calibration note says which shortcuts are blocked.
+
+## Related open-source activity
+
+Harness and task drafts in the same craft (not part of the Zenodo bibliographic references):
+
+- [Harbor #4003](https://github.com/harbor-framework/harbor/pull/4003): write target trajectory when a user agent is present
+- [Terminal-Bench #2480](https://github.com/harbor-framework/terminal-bench/pull/2480): `lease-fencing-reaper`

@@ -3,13 +3,12 @@
 **Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace**
 
 Gyanu Mayank  
-Independent  
-31 October 2026  
-Version 0.1.1  
-**DOI:** https://doi.org/10.5281/zenodo.23829462
+B.Tech (Computer Science and Engineering), National Institute of Technology Patna  
+Pune, India · gyanumayank0@gmail.com · https://github.com/gyanu2507  
+31 October 2026 · Version 0.1.2  
 
-**Code:** https://github.com/gyanu2507/agent-eval-suite  
-**Companion PRs:** [Harbor #4003](https://github.com/harbor-framework/harbor/pull/4003), [Terminal-Bench #2480](https://github.com/harbor-framework/terminal-bench/pull/2480) (`lease-fencing-reaper`)
+**Cite (concept DOI, always latest):** https://doi.org/10.5281/zenodo.23829461  
+**Code:** https://github.com/gyanu2507/agent-eval-suite
 
 ---
 
@@ -31,12 +30,9 @@ This is not a leaderboard and not a claim about frontier models. It is a public 
 | [Harbor](https://github.com/harbor-framework/harbor) | Parallel trials, trajectories, verifier rewards | Whether the reward is gameable |
 | [Inspect](https://inspect.aisi.org.uk/) | Dataset + solver/agent + scorer composition, sandboxes | The same craft question at sample level |
 
-I treat the Terminal-Bench shape as the right container: English instruction, environment, tests that check final state, reference solution. Harbor is the runner I contribute harness fixes to. The suite here is smaller and deliberately public. The private analogues used different domains. The failure classes match: ordering, idempotency, dual consumers, and reports that look green while the method did nothing.
+I treat the Terminal-Bench shape as the right container: English instruction, environment, tests that check final state, reference solution. Harbor is the runner. The suite here is smaller and deliberately public. The private analogues used different domains. The failure classes match: ordering, idempotency, dual consumers, and reports that look green while the method did nothing.
 
-Two open contributions sit next to this note:
-
-- **Harbor #4003** writes the target trajectory when a user agent is present, so trial context is not silent about who ran.
-- **Terminal-Bench #2480** adds `lease-fencing-reaper`: exclusive leases, fencing tokens, a reaper under an injected logical clock. Stale renew/release after reclaim, wrong reap under the clock, and token reuse after release are the named bugs. Same design bar as the suite below.
+Related open-source activity (not bibliographic references): a Harbor harness fix that writes the target trajectory when a user agent is present, and a Terminal-Bench task draft `lease-fencing-reaper` (exclusive leases, fencing tokens, reaper under an injected logical clock). Same design bar as the suite below. Links live in the repository README.
 
 ---
 
@@ -175,36 +171,18 @@ I use this format when the tests already said fail and the question is process j
 
 ---
 
-## 6. Adjacent Terminal-Bench work
-
-`lease-fencing-reaper` (open PR against `harbor-framework/terminal-bench`) is the same craft in TB’s container format.
-
-Observed symptoms the instruction names:
-
-- After expiry and reclaim, the previous owner’s fencing token can still renew or release.
-- Reaping frees live leases under the injected clock, or misses expired ones.
-- Holder checks report true past expiry.
-- After release or reclaim, acquire reuses an old fencing token.
-
-Intended semantics live in `DESIGN.md`. Time comes only from the injected `Clock`. Types and design files are read-only. That is the Harbor/TB shape: outcome tests on final state, oracle solution, no cheating the clock by editing the contract files.
-
-I am not claiming a leaderboard score on Terminal-Bench 2.0. The PR is the contribution. This suite is the portable explanation of the bar.
-
----
-
-## 7. Limits
+## 6. Limits
 
 - Three tasks. Synthetic or small fixtures only.
 - No multi-model agent sweep published here. The staged ledger trace is constructed.
-- Harbor and Terminal-Bench PRs may still be open at the time you read this. Check the links.
 - Private client work is not included. Names and fixtures stay out on purpose.
 - This note does not claim SOTA, safety properties, or that the gate values generalize beyond these CSVs.
 
-If you want a larger public set, the next useful additions are a flake-prone timing task with a deterministic clock seam, and a verifier that diffs trajectories against the rubric automatically. Neither is in 0.1.0.
+If you want a larger public set, the next useful additions are a flake-prone timing task with a deterministic clock seam, and a verifier that diffs trajectories against the rubric automatically. Neither is in 0.1.2.
 
 ---
 
-## 8. Reproduce
+## 7. Reproduce
 
 ```bash
 git clone https://github.com/gyanu2507/agent-eval-suite
@@ -228,11 +206,13 @@ Harbor Framework. https://github.com/harbor-framework/harbor
 
 UK AI Security Institute. *Inspect*. https://inspect.aisi.org.uk/
 
-Mayank, G. (2026). *When the delta is fake* (v0.1.1). Zenodo. https://doi.org/10.5281/zenodo.23829462
+Mayank, G. (2026). *When the delta is fake* (v0.1.2). Zenodo. https://doi.org/10.5281/zenodo.23829461
 
 ---
 
 ## Citation
+
+Prefer the **concept DOI** so citations resolve to the latest version.
 
 ```bibtex
 @techreport{mayank2026deltafake,
@@ -240,9 +220,9 @@ Mayank, G. (2026). *When the delta is fake* (v0.1.1). Zenodo. https://doi.org/10
   title        = {When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace},
   year         = {2026},
   month        = {10},
-  institution  = {Independent},
-  version      = {0.1.1},
-  doi          = {10.5281/zenodo.23829462},
-  url          = {https://doi.org/10.5281/zenodo.23829462}
+  institution  = {National Institute of Technology Patna},
+  version      = {0.1.2},
+  doi          = {10.5281/zenodo.23829461},
+  url          = {https://doi.org/10.5281/zenodo.23829461}
 }
 ```

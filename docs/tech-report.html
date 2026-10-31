@@ -163,14 +163,12 @@
 <p class="subtitle">Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace</p>
 
 <div class="meta">
-  <div><strong>Gyanu Mayank</strong> · Independent · 31 October 2026 · v0.1.1</div>
-  <div>DOI: <a href="https://doi.org/10.5281/zenodo.23829462">10.5281/zenodo.23829462</a></div>
+  <div><strong>Gyanu Mayank</strong></div>
+  <div>B.Tech (Computer Science and Engineering), National Institute of Technology Patna</div>
+  <div>Pune, India · gyanumayank0@gmail.com · github.com/gyanu2507</div>
+  <div>31 October 2026 · v0.1.2</div>
+  <div>Cite (concept DOI): <a href="https://doi.org/10.5281/zenodo.23829461">10.5281/zenodo.23829461</a></div>
   <div>Code: <a href="https://github.com/gyanu2507/agent-eval-suite">github.com/gyanu2507/agent-eval-suite</a></div>
-  <div>Companion PRs:
-    <a href="https://github.com/harbor-framework/harbor/pull/4003">Harbor #4003</a>,
-    <a href="https://github.com/harbor-framework/terminal-bench/pull/2480">Terminal-Bench #2480</a>
-    (<code>lease-fencing-reaper</code>)
-  </div>
 </div>
 
 <div class="abstract">
@@ -205,13 +203,8 @@
   </tbody>
 </table>
 
-<p>I treat the Terminal-Bench shape as the right container: English instruction, environment, tests that check final state, reference solution. Harbor is the runner I contribute harness fixes to. The suite here is smaller and deliberately public. The private analogues used different domains. The failure classes match: ordering, idempotency, dual consumers, and reports that look green while the method did nothing.</p>
-
-<p>Two open contributions sit next to this note:</p>
-<ul>
-  <li><strong>Harbor #4003</strong> writes the target trajectory when a user agent is present, so trial context is not silent about who ran.</li>
-  <li><strong>Terminal-Bench #2480</strong> adds <code>lease-fencing-reaper</code>: exclusive leases, fencing tokens, a reaper under an injected logical clock. Stale renew/release after reclaim, wrong reap under the clock, and token reuse after release are the named bugs. Same design bar as the suite below.</li>
-</ul>
+<p>I treat the Terminal-Bench shape as the right container: English instruction, environment, tests that check final state, reference solution. Harbor is the runner. The suite here is smaller and deliberately public. The private analogues used different domains. The failure classes match: ordering, idempotency, dual consumers, and reports that look green while the method did nothing.</p>
+<p>Related open-source activity (not bibliographic references): a Harbor harness fix that writes the target trajectory when a user agent is present, and a Terminal-Bench task draft <code>lease-fencing-reaper</code>. Same design bar as the suite below. Links live in the repository README.</p>
 
 <h2>2. Design bar</h2>
 <p>A task ships when all four hold:</p>
@@ -291,23 +284,16 @@ Agent introduces prefix dedupe after seeing a collision failure, -3</code></pre>
 <p>Positive sum: 13. Negatives cover the shortcuts this staged run took. The run fails the task and the rubric. A mergeable fix clears the six positives without touching <code>data/</code>.</p>
 <p>I use this format when the tests already said fail and the question is process judgment: did the agent repair the contract, or did it negotiate with the fixtures?</p>
 
-<h2>6. Adjacent Terminal-Bench work</h2>
-<p><code>lease-fencing-reaper</code> (open PR against <code>harbor-framework/terminal-bench</code>) is the same craft in TB’s container format.</p>
-<p>Observed symptoms the instruction names: after expiry and reclaim, the previous owner’s fencing token can still renew or release; reaping frees live leases under the injected clock, or misses expired ones; holder checks report true past expiry; after release or reclaim, acquire reuses an old fencing token.</p>
-<p>Intended semantics live in <code>DESIGN.md</code>. Time comes only from the injected <code>Clock</code>. Types and design files are read-only. That is the Harbor/TB shape: outcome tests on final state, oracle solution, no cheating the clock by editing the contract files.</p>
-<p>I am not claiming a leaderboard score on Terminal-Bench 2.0. The PR is the contribution. This suite is the portable explanation of the bar.</p>
-
-<h2>7. Limits</h2>
+<h2>6. Limits</h2>
 <ul>
   <li>Three tasks. Synthetic or small fixtures only.</li>
   <li>No multi-model agent sweep published here. The staged ledger trace is constructed.</li>
-  <li>Harbor and Terminal-Bench PRs may still be open at the time you read this. Check the links.</li>
   <li>Private client work is not included. Names and fixtures stay out on purpose.</li>
   <li>This note does not claim SOTA, safety properties, or that the gate values generalize beyond these CSVs.</li>
 </ul>
-<p>If you want a larger public set, the next useful additions are a flake-prone timing task with a deterministic clock seam, and a verifier that diffs trajectories against the rubric automatically. Neither is in 0.1.0.</p>
+<p>If you want a larger public set, the next useful additions are a flake-prone timing task with a deterministic clock seam, and a verifier that diffs trajectories against the rubric automatically. Neither is in 0.1.2.</p>
 
-<h2>8. Reproduce</h2>
+<h2>7. Reproduce</h2>
 <pre><code>git clone https://github.com/gyanu2507/agent-eval-suite
 cd agent-eval-suite
 python3 -m pytest -q -p no:randomly \
@@ -322,20 +308,21 @@ python3 tasks/site-shift-meter/solution/train_and_eval.py</code></pre>
 <p>Merrill, M. A., Shaw, A. G., Carlini, N., et al. (2026). <em>Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces</em>. arXiv:2601.11868. https://arxiv.org/abs/2601.11868</p>
 <p>Harbor Framework. https://github.com/harbor-framework/harbor</p>
 <p>UK AI Security Institute. <em>Inspect</em>. https://inspect.aisi.org.uk/</p>
-<p>Mayank, G. (2026). <em>When the delta is fake</em> (v0.1.1). Zenodo. https://doi.org/10.5281/zenodo.23829462</p>
+<p>Mayank, G. (2026). <em>When the delta is fake</em> (v0.1.2). Zenodo. https://doi.org/10.5281/zenodo.23829461</p>
 </div>
 
 <h2>Citation</h2>
+<p>Prefer the <strong>concept DOI</strong> so citations resolve to the latest version.</p>
 <pre><code>@techreport{mayank2026deltafake,
   author       = {Mayank, Gyanu},
   title        = {When the delta is fake: Three public agent-eval tasks
                   with nop starters, frozen controls, and a scored fail trace},
   year         = {2026},
   month        = {10},
-  institution  = {Independent},
-  version      = {0.1.1},
-  doi          = {10.5281/zenodo.23829462},
-  url          = {https://doi.org/10.5281/zenodo.23829462}
+  institution  = {National Institute of Technology Patna},
+  version      = {0.1.2},
+  doi          = {10.5281/zenodo.23829461},
+  url          = {https://doi.org/10.5281/zenodo.23829461}
 }</code></pre>
 
 </body>

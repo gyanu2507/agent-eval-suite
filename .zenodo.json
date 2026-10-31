@@ -1,46 +1,43 @@
 {
   "title": "When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace",
-  "description": "Technical report and public mini-suite for agent evaluation craft. Three tasks (clearing-hold-ledger, slot-ring-buffer, site-shift-meter) with nop starters, oracles, artifact-recomputed scores, calibration notes, a staged fail trace rubric, and companion links to Harbor PR #4003 and Terminal-Bench PR #2480 (lease-fencing-reaper).",
+  "description": "<p>Technical note and public mini-suite on agent-evaluation craft. Ships three tasks (<code>clearing-hold-ledger</code>, <code>slot-ring-buffer</code>, <code>site-shift-meter</code>) with named starter failures, oracle solutions, verifiers that recompute scores from artifacts, calibration notes, a site-shift case study (why mean-only adaptation can leave ranking AUROC unchanged), and a scored staged-fail trace rubric.</p><p>Designed against the Terminal-Bench task shape (instruction, environment, outcome tests, oracle) and usable next to Harbor / Inspect-style harnesses. Synthetic fixtures only. Not a leaderboard.</p><p><strong>Reproduce:</strong> <code>pytest -q -p no:randomly tasks/*/tests</code> then <code>python3 tasks/site-shift-meter/solution/train_and_eval.py</code>.</p>",
   "upload_type": "publication",
   "publication_type": "technicalnote",
+  "access_right": "open",
+  "license": "mit-license",
+  "language": "eng",
+  "version": "0.1.2",
   "creators": [
     {
       "name": "Mayank, Gyanu",
-      "affiliation": "Independent"
+      "affiliation": "National Institute of Technology Patna"
     }
   ],
   "keywords": [
     "agent evaluation",
+    "AI agents",
+    "benchmark design",
     "Terminal-Bench",
     "Harbor",
-    "Inspect AI",
-    "benchmark design",
+    "Inspect",
     "distribution shift",
-    "trace review"
+    "AUROC",
+    "trace review",
+    "software testing"
   ],
-  "license": "mit",
   "related_identifiers": [
     {
       "identifier": "https://github.com/gyanu2507/agent-eval-suite",
       "relation": "isSupplementTo",
-      "resource_type": "software"
+      "resource_type": "software",
+      "scheme": "url"
     },
     {
       "identifier": "10.48550/arXiv.2601.11868",
       "relation": "cites",
-      "scheme": "doi",
-      "resource_type": "publication-article"
-    },
-    {
-      "identifier": "https://github.com/harbor-framework/harbor/pull/4003",
-      "relation": "references",
-      "resource_type": "other"
-    },
-    {
-      "identifier": "https://github.com/harbor-framework/terminal-bench/pull/2480",
-      "relation": "references",
-      "resource_type": "other"
+      "resource_type": "publication-article",
+      "scheme": "doi"
     }
   ],
-  "version": "0.1.1"
+  "notes": "Author: Gyanu Mayank (B.Tech CSE, NIT Patna; Pune, India). Contact: gyanumayank0@gmail.com. Prefer the concept DOI https://doi.org/10.5281/zenodo.23829461 when citing (resolves to the latest version)."
 }

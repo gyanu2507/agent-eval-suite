@@ -1,6 +1,6 @@
 # Case study: when a “shift fix” does nothing
 
-Full writeup: [tech report](tech-report.md) (PDF in [v0.1.0](https://github.com/gyanu2507/agent-eval-suite/releases/tag/v0.1.0)).
+Full writeup: [tech report](tech-report.md) ([DOI](https://doi.org/10.5281/zenodo.23829462), PDF in [v0.1.1](https://github.com/gyanu2507/agent-eval-suite/releases/tag/v0.1.1)).
 
 Task: `site-shift-meter`. Train on sites S0/S1, score on S2.
 

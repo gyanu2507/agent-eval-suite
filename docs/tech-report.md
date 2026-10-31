@@ -5,7 +5,8 @@
 Gyanu Mayank  
 Independent  
 31 October 2026  
-Version 0.1.0
+Version 0.1.1  
+**DOI:** https://doi.org/10.5281/zenodo.23829462
 
 **Code:** https://github.com/gyanu2507/agent-eval-suite  
 **Companion PRs:** [Harbor #4003](https://github.com/harbor-framework/harbor/pull/4003), [Terminal-Bench #2480](https://github.com/harbor-framework/terminal-bench/pull/2480) (`lease-fencing-reaper`)
@@ -227,7 +228,7 @@ Harbor Framework. https://github.com/harbor-framework/harbor
 
 UK AI Security Institute. *Inspect*. https://inspect.aisi.org.uk/
 
-Mayank, G. (2026). *agent-eval-suite* (v0.1.0). https://github.com/gyanu2507/agent-eval-suite
+Mayank, G. (2026). *When the delta is fake* (v0.1.1). Zenodo. https://doi.org/10.5281/zenodo.23829462
 
 ---
 
@@ -240,9 +241,8 @@ Mayank, G. (2026). *agent-eval-suite* (v0.1.0). https://github.com/gyanu2507/age
   year         = {2026},
   month        = {10},
   institution  = {Independent},
-  version      = {0.1.0},
-  url          = {https://github.com/gyanu2507/agent-eval-suite}
+  version      = {0.1.1},
+  doi          = {10.5281/zenodo.23829462},
+  url          = {https://doi.org/10.5281/zenodo.23829462}
 }
 ```
-
-After a Zenodo DOI exists for this version, replace the `url` field with the DOI URL and add `doi = {...}`.

@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: If you use this suite or the tech report, please cite it.
+type: software
+title: "When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace"
+version: "0.1.1"
+date-released: "2026-10-31"
+authors:
+  - family-names: Mayank
+    given-names: Gyanu
+    email: gyanumayank0@gmail.com
+repository-code: "https://github.com/gyanu2507/agent-eval-suite"
+url: "https://doi.org/10.5281/zenodo.23829462"
+doi: "10.5281/zenodo.23829462"
+license: MIT
+keywords:
+  - agent evaluation
+  - Terminal-Bench
+  - Harbor
+  - benchmark design
+  - distribution shift
+  - trace review
+abstract: >-
+  Public mini-suite and tech report on agent-eval craft: three tasks with nop
+  starters, oracles, artifact-recomputed scores, a site-shift case study, and a
+  scored ledger fail trace. Companion contributions to Harbor and Terminal-Bench.
+preferred-citation:
+  type: report
+  title: "When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace"
+  authors:
+    - family-names: Mayank
+      given-names: Gyanu
+  year: 2026
+  month: 10
+  version: "0.1.1"
+  institution: Independent
+  doi: "10.5281/zenodo.23829462"
+  url: "https://doi.org/10.5281/zenodo.23829462"

@@ -2,7 +2,8 @@
 
 Public samples of how I design agent evaluation tasks. Original code and synthetic data only.
 
-**Tech report (v0.1.0):** [When the delta is fake](docs/tech-report.md) ([HTML](docs/tech-report.html), [PDF](docs/tech-report.pdf))
+**Tech report:** [When the delta is fake](docs/tech-report.md) ([HTML](docs/tech-report.html), [PDF](docs/tech-report.pdf))  
+**DOI:** [10.5281/zenodo.23829462](https://doi.org/10.5281/zenodo.23829462) · cite via [`CITATION.cff`](CITATION.cff)
 
 Short forms: [case study](docs/case-study.md) (site-shift pass bar), [trace review](docs/trace-review.md) (scored ledger fail).
 

@@ -2,7 +2,11 @@
 
 Public samples of how I design agent evaluation tasks. Original code and synthetic data only.
 
-Read the [case study](docs/case-study.md) for pass-bar reasoning, and the [trace review](docs/trace-review.md) for how I score a failing agent run.
+**Tech report (v0.1.0):** [When the delta is fake](docs/tech-report.md) ([HTML](docs/tech-report.html), [PDF](docs/tech-report.pdf))
+
+Short forms: [case study](docs/case-study.md) (site-shift pass bar), [trace review](docs/trace-review.md) (scored ledger fail).
+
+Companion PRs: [Harbor #4003](https://github.com/harbor-framework/harbor/pull/4003), [Terminal-Bench #2480](https://github.com/harbor-framework/terminal-bench/pull/2480) (`lease-fencing-reaper`).
 
 ## Tasks
 

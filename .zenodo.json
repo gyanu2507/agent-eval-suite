@@ -1,0 +1,46 @@
+{
+  "title": "When the delta is fake: Three public agent-eval tasks with nop starters, frozen controls, and a scored fail trace",
+  "description": "Technical report and public mini-suite for agent evaluation craft. Three tasks (clearing-hold-ledger, slot-ring-buffer, site-shift-meter) with nop starters, oracles, artifact-recomputed scores, calibration notes, a staged fail trace rubric, and companion links to Harbor PR #4003 and Terminal-Bench PR #2480 (lease-fencing-reaper).",
+  "upload_type": "publication",
+  "publication_type": "technicalnote",
+  "creators": [
+    {
+      "name": "Mayank, Gyanu",
+      "affiliation": "Independent"
+    }
+  ],
+  "keywords": [
+    "agent evaluation",
+    "Terminal-Bench",
+    "Harbor",
+    "Inspect AI",
+    "benchmark design",
+    "distribution shift",
+    "trace review"
+  ],
+  "license": "mit",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/gyanu2507/agent-eval-suite",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.48550/arXiv.2601.11868",
+      "relation": "cites",
+      "scheme": "doi",
+      "resource_type": "publication-article"
+    },
+    {
+      "identifier": "https://github.com/harbor-framework/harbor/pull/4003",
+      "relation": "references",
+      "resource_type": "other"
+    },
+    {
+      "identifier": "https://github.com/harbor-framework/terminal-bench/pull/2480",
+      "relation": "references",
+      "resource_type": "other"
+    }
+  ],
+  "version": "0.1.0"
+}

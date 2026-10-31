@@ -1,0 +1,14 @@
+{
+  "rc": 0,
+  "wall_s": 84.6,
+  "cuda": true,
+  "gpu": "Tesla T4",
+  "out_exists": true,
+  "out_files": [
+    "README.md",
+    "adapter_config.json",
+    "adapter_model.safetensors",
+    "train_metrics.json"
+  ],
+  "error": null
+}

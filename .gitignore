@@ -13,3 +13,5 @@ tasks/*/environment/app/clearing_state.json
 tasks/*/environment/app/artifacts/
 experiments/sft/kaggle/output*/
 experiments/sft/kaggle/output/
+experiments/sft/kaggle-dpo/output*/
+experiments/sft/kaggle-dpo/output/

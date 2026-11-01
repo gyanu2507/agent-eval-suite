@@ -1,0 +1,18 @@
+{
+  "rc": 0,
+  "wall_s": 88.8,
+  "cuda": true,
+  "gpu": "Tesla T4",
+  "out_exists": true,
+  "out_files": [
+    "README.md",
+    "adapter_config.json",
+    "adapter_model.safetensors",
+    "chat_template.jinja",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "train_metrics.json",
+    "training_args.bin"
+  ],
+  "error": null
+}

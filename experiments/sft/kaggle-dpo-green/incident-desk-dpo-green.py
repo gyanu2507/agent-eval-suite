@@ -137,20 +137,21 @@ def train_dpo(
     rejected_txt = rejected["messages"][2]["content"]
     rows = [
         {"prompt": prompt, "chosen": chosen_txt, "rejected": rejected_txt}
-        for _ in range(16)
+        for _ in range(8)
     ]
     ds = Dataset.from_list(rows)
 
-    # Merge green SFT into base, then attach a fresh LoRA for DPO.
+    # Merge green SFT into base, then attach a fresh LoRA for light DPO.
+    # Keep KL high and steps low so tool-trace behavior is not wiped.
     base = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
     merged = PeftModel.from_pretrained(base, str(sft_adapter))
     merged = merged.merge_and_unload()
 
     cfg_kwargs = {
         "output_dir": str(OUT / "trainer"),
-        "num_train_epochs": 5,
+        "num_train_epochs": 1,
         "per_device_train_batch_size": 1,
-        "learning_rate": 5e-5,
+        "learning_rate": 1e-5,
         "logging_steps": 1,
         "report_to": [],
         "save_strategy": "no",
@@ -159,7 +160,7 @@ def train_dpo(
         "dataloader_pin_memory": False,
         "max_length": 2048,
         "max_prompt_length": 1024,
-        "beta": 0.1,
+        "beta": 0.5,
     }
     accepted = set(inspect.signature(DPOConfig.__init__).parameters)
     cfg_kwargs = {k: v for k, v in cfg_kwargs.items() if k in accepted}
@@ -185,8 +186,10 @@ def train_dpo(
     trainer.save_model(str(adapter_out))
     metrics = {
         "train_loss": getattr(train_out, "training_loss", None),
-        "epochs": 5,
-        "n_pairs": 16,
+        "epochs": 1,
+        "n_pairs": 8,
+        "lr": 1e-5,
+        "beta": 0.5,
         "init": "merge_sft_green",
     }
     (OUT / "train_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")

@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-9999",
+    "title": "tax calc timeouts",
+    "opened_ts": 5000,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 400,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 12000,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "Z-22",
+      "service": "api",
+      "ts": 5005,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "Z-2",
+      "service": "api",
+      "ts": 5002,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "Z-22",
+      "service": "payments",
+      "ts": 5008,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "Z-21",
+      "service": "payments",
+      "ts": 5007,
+      "msg": "warn timeout_ms=400 below SLO"
+    },
+    {
+      "id": "Z-20",
+      "service": "worker",
+      "ts": 5010,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "Z-3",
+      "service": "api",
+      "ts": 5012,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 5000
+}

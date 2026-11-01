@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3107",
+    "title": "payout gateway 504",
+    "opened_ts": 3800,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 850,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 9500,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "H-2",
+      "service": "api",
+      "ts": 3805,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "H-2",
+      "service": "api",
+      "ts": 3802,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "H-18",
+      "service": "payments",
+      "ts": 3808,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "H-1",
+      "service": "payments",
+      "ts": 3807,
+      "msg": "warn timeout_ms=850 below SLO"
+    },
+    {
+      "id": "H-20",
+      "service": "worker",
+      "ts": 3810,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "H-3",
+      "service": "api",
+      "ts": 3812,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 3800
+}

@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3103",
+    "title": "refund queue stall",
+    "opened_ts": 2200,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 500,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 7500,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "C-4",
+      "service": "api",
+      "ts": 2205,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "C-2",
+      "service": "api",
+      "ts": 2202,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "C-14",
+      "service": "payments",
+      "ts": 2208,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "C-3",
+      "service": "payments",
+      "ts": 2207,
+      "msg": "warn timeout_ms=500 below SLO"
+    },
+    {
+      "id": "C-20",
+      "service": "worker",
+      "ts": 2210,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "C-3",
+      "service": "api",
+      "ts": 2212,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 2200
+}

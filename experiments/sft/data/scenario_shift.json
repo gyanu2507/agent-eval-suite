@@ -6,9 +6,18 @@
     "service_hint": "api"
   },
   "services": {
-    "api": {"status": "up", "restart_settle_sec": 2},
-    "payments": {"status": "degraded", "restart_settle_sec": 5},
-    "worker": {"status": "up", "restart_settle_sec": 3}
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
   },
   "config": {
     "payments.timeout_ms": 600,
@@ -19,12 +28,42 @@
     "api.retries": 2
   },
   "logs": [
-    {"id": "E-10", "service": "api", "ts": 2005, "msg": "error upstream timeout"},
-    {"id": "E-2", "service": "api", "ts": 2002, "msg": "warn slow handler"},
-    {"id": "E-11", "service": "payments", "ts": 2008, "msg": "error timeout budget exhausted"},
-    {"id": "E-9", "service": "payments", "ts": 2007, "msg": "warn timeout_ms=600 below SLO"},
-    {"id": "E-20", "service": "worker", "ts": 2010, "msg": "info queue lag normal"},
-    {"id": "E-3", "service": "api", "ts": 2012, "msg": "error payments gateway 504"}
+    {
+      "id": "E-10",
+      "service": "api",
+      "ts": 2005,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "E-2",
+      "service": "api",
+      "ts": 2002,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "E-11",
+      "service": "payments",
+      "ts": 2008,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "E-9",
+      "service": "payments",
+      "ts": 2007,
+      "msg": "warn timeout_ms=600 below SLO"
+    },
+    {
+      "id": "E-20",
+      "service": "worker",
+      "ts": 2010,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "E-3",
+      "service": "api",
+      "ts": 2012,
+      "msg": "error payments gateway 504"
+    }
   ],
   "clock_start": 2000
 }

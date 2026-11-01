@@ -4,17 +4,24 @@ Trajectories from `incident-tool-desk` for a small post-training loop. **Do not 
 
 ## Data
 
-Generate:
+Single-ticket export (legacy smokes):
 
 ```bash
 python3 experiments/sft/export_trajectories.py
 ```
 
+Multi-scenario export (varied ticket / log-id prefixes; preferred for generalization):
+
+```bash
+python3 experiments/sft/build_multi_scenario.py
+```
+
 Writes `experiments/sft/data/`:
 
-- `oracle.jsonl` — positive demonstrations (label `chosen`)
-- `starter.jsonl` — failing traces (label `rejected` for DPO)
-- `premature.jsonl` — false-green resolutions (also `rejected`)
+- `oracle.jsonl` — single-ticket positive demos
+- `multi_oracle.jsonl` — 8 train tickets with distinct evidence id prefixes
+- `scenario_shift.json` / `scenario_unseen.json` — holdouts (`INC-7777`, `INC-9999`)
+- `starter.jsonl` / `premature.jsonl` — rejected traces for DPO
 
 Each line is a chat-style record: system + user instruction + assistant tool-call transcript.
 

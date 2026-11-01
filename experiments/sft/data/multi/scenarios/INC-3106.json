@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3106",
+    "title": "ledger write delay",
+    "opened_ts": 3400,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 550,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 4500,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "G-8",
+      "service": "api",
+      "ts": 3405,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "G-2",
+      "service": "api",
+      "ts": 3402,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "G-16",
+      "service": "payments",
+      "ts": 3408,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "G-7",
+      "service": "payments",
+      "ts": 3407,
+      "msg": "warn timeout_ms=550 below SLO"
+    },
+    {
+      "id": "G-20",
+      "service": "worker",
+      "ts": 3410,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "G-3",
+      "service": "api",
+      "ts": 3412,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 3400
+}

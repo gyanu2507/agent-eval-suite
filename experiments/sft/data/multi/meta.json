@@ -1,0 +1,98 @@
+{
+  "train": [
+    {
+      "ticket_id": "INC-2048",
+      "log_prefix": "L",
+      "expected_evidence": [
+        "L-9",
+        "L-11"
+      ],
+      "baseline": 5000
+    },
+    {
+      "ticket_id": "INC-3101",
+      "log_prefix": "A",
+      "expected_evidence": [
+        "A-4",
+        "A-12"
+      ],
+      "baseline": 4000
+    },
+    {
+      "ticket_id": "INC-3102",
+      "log_prefix": "B",
+      "expected_evidence": [
+        "B-6",
+        "B-15"
+      ],
+      "baseline": 6000
+    },
+    {
+      "ticket_id": "INC-3103",
+      "log_prefix": "C",
+      "expected_evidence": [
+        "C-3",
+        "C-14"
+      ],
+      "baseline": 7500
+    },
+    {
+      "ticket_id": "INC-3104",
+      "log_prefix": "D",
+      "expected_evidence": [
+        "D-8",
+        "D-17"
+      ],
+      "baseline": 5500
+    },
+    {
+      "ticket_id": "INC-3105",
+      "log_prefix": "F",
+      "expected_evidence": [
+        "F-5",
+        "F-13"
+      ],
+      "baseline": 8000
+    },
+    {
+      "ticket_id": "INC-3106",
+      "log_prefix": "G",
+      "expected_evidence": [
+        "G-7",
+        "G-16"
+      ],
+      "baseline": 4500
+    },
+    {
+      "ticket_id": "INC-3107",
+      "log_prefix": "H",
+      "expected_evidence": [
+        "H-1",
+        "H-18"
+      ],
+      "baseline": 9500
+    }
+  ],
+  "holdout": [
+    {
+      "name": "shift",
+      "ticket_id": "INC-7777",
+      "log_prefix": "E",
+      "expected_evidence": [
+        "E-9",
+        "E-11"
+      ],
+      "scenario_file": "scenario_shift.json"
+    },
+    {
+      "name": "unseen",
+      "ticket_id": "INC-9999",
+      "log_prefix": "Z",
+      "expected_evidence": [
+        "Z-21",
+        "Z-22"
+      ],
+      "scenario_file": "scenario_unseen.json"
+    }
+  ]
+}

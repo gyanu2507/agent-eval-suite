@@ -12,7 +12,8 @@ from desk import Desk  # noqa: E402
 
 
 def run_policy(desk: Desk) -> dict:
-    ticket = desk.get_ticket("INC-2048")
+    ticket_id = desk.scenario["ticket"]["id"]
+    ticket = desk.get_ticket(ticket_id)
     opened = int(ticket["opened_ts"])
 
     pay_logs = desk.get_logs("payments", since_ts=opened)
@@ -29,7 +30,6 @@ def run_policy(desk: Desk) -> dict:
         desk.set_config("payments.timeout_ms", baseline)
 
     desk.restart_service("payments")
-    # Settle window is 5s from scenario.
     while True:
         h = desk.health("payments")
         if h.get("status") == "ok":
@@ -37,7 +37,7 @@ def run_policy(desk: Desk) -> dict:
         desk.advance_clock(1)
 
     return desk.submit_resolution(
-        ticket_id="INC-2048",
+        ticket_id=ticket_id,
         root_cause="config_drift:payments.timeout_ms",
         actions=["set_config", "restart_service"],
         evidence_log_ids=evidence,

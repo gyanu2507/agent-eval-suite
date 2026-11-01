@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3105",
+    "title": "settlement drift",
+    "opened_ts": 3000,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 750,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 8000,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "F-6",
+      "service": "api",
+      "ts": 3005,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "F-2",
+      "service": "api",
+      "ts": 3002,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "F-13",
+      "service": "payments",
+      "ts": 3008,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "F-5",
+      "service": "payments",
+      "ts": 3007,
+      "msg": "warn timeout_ms=750 below SLO"
+    },
+    {
+      "id": "F-20",
+      "service": "worker",
+      "ts": 3010,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "F-3",
+      "service": "api",
+      "ts": 3012,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 3000
+}

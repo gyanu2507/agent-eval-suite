@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3101",
+    "title": "cart timeout cascade",
+    "opened_ts": 1500,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 700,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 4000,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "A-5",
+      "service": "api",
+      "ts": 1505,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "A-2",
+      "service": "api",
+      "ts": 1502,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "A-12",
+      "service": "payments",
+      "ts": 1508,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "A-4",
+      "service": "payments",
+      "ts": 1507,
+      "msg": "warn timeout_ms=700 below SLO"
+    },
+    {
+      "id": "A-20",
+      "service": "worker",
+      "ts": 1510,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "A-3",
+      "service": "api",
+      "ts": 1512,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 1500
+}

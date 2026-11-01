@@ -1,0 +1,69 @@
+{
+  "ticket": {
+    "id": "INC-3102",
+    "title": "invoice lag",
+    "opened_ts": 1800,
+    "service_hint": "api"
+  },
+  "services": {
+    "api": {
+      "status": "up",
+      "restart_settle_sec": 2
+    },
+    "payments": {
+      "status": "degraded",
+      "restart_settle_sec": 5
+    },
+    "worker": {
+      "status": "up",
+      "restart_settle_sec": 3
+    }
+  },
+  "config": {
+    "payments.timeout_ms": 900,
+    "api.retries": 2
+  },
+  "baseline_config": {
+    "payments.timeout_ms": 6000,
+    "api.retries": 2
+  },
+  "logs": [
+    {
+      "id": "B-7",
+      "service": "api",
+      "ts": 1805,
+      "msg": "error upstream timeout"
+    },
+    {
+      "id": "B-2",
+      "service": "api",
+      "ts": 1802,
+      "msg": "warn slow handler"
+    },
+    {
+      "id": "B-15",
+      "service": "payments",
+      "ts": 1808,
+      "msg": "error timeout budget exhausted"
+    },
+    {
+      "id": "B-6",
+      "service": "payments",
+      "ts": 1807,
+      "msg": "warn timeout_ms=900 below SLO"
+    },
+    {
+      "id": "B-20",
+      "service": "worker",
+      "ts": 1810,
+      "msg": "info queue lag normal"
+    },
+    {
+      "id": "B-3",
+      "service": "api",
+      "ts": 1812,
+      "msg": "error payments gateway 504"
+    }
+  ],
+  "clock_start": 1800
+}

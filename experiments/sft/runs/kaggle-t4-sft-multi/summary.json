@@ -1,0 +1,99 @@
+{
+  "train": {
+    "train_loss": 0.024127999784104757,
+    "epochs": 20,
+    "n_unique": 8,
+    "n_dup_per": 4,
+    "n_train": 32,
+    "lora_r": 16
+  },
+  "evals": {
+    "train_ticket": {
+      "result": {
+        "generation": {
+          "pass": true,
+          "checks": {
+            "root_cause": true,
+            "actions": true,
+            "evidence": true,
+            "timeout_restored": true,
+            "payments_ok": true,
+            "resolution_health": true,
+            "resolution_timeout": true,
+            "submitted": true
+          },
+          "expected_evidence": [
+            "L-9",
+            "L-11"
+          ],
+          "audit_len": 17,
+          "n_calls_parsed": 17,
+          "replay_errors": []
+        },
+        "n_gen_chars": 1885,
+        "scenario": "/tmp/agent-eval-suite/tasks/incident-tool-desk/environment/app/data/scenario.json",
+        "ticket_id": "INC-2048"
+      },
+      "pass": true
+    },
+    "shift_ticket": {
+      "result": {
+        "generation": {
+          "pass": false,
+          "checks": {
+            "root_cause": true,
+            "actions": true,
+            "evidence": false,
+            "timeout_restored": true,
+            "payments_ok": true,
+            "resolution_health": true,
+            "resolution_timeout": true,
+            "submitted": true
+          },
+          "expected_evidence": [
+            "E-9",
+            "E-11"
+          ],
+          "audit_len": 17,
+          "n_calls_parsed": 17,
+          "replay_errors": []
+        },
+        "n_gen_chars": 1883,
+        "scenario": "/tmp/agent-eval-suite/experiments/sft/data/scenario_shift.json",
+        "ticket_id": "INC-7777"
+      },
+      "pass": false
+    },
+    "unseen_ticket": {
+      "result": {
+        "generation": {
+          "pass": false,
+          "checks": {
+            "root_cause": true,
+            "actions": true,
+            "evidence": false,
+            "timeout_restored": true,
+            "payments_ok": true,
+            "resolution_health": true,
+            "resolution_timeout": true,
+            "submitted": true
+          },
+          "expected_evidence": [
+            "Z-21",
+            "Z-22"
+          ],
+          "audit_len": 17,
+          "n_calls_parsed": 17,
+          "replay_errors": []
+        },
+        "n_gen_chars": 1882,
+        "scenario": "/tmp/agent-eval-suite/experiments/sft/data/scenario_unseen.json",
+        "ticket_id": "INC-9999"
+      },
+      "pass": false
+    }
+  },
+  "train_pass": true,
+  "shift_pass": false,
+  "unseen_pass": false
+}

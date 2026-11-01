@@ -1,0 +1,8 @@
+{
+  "train_loss": 0.024127999784104757,
+  "epochs": 20,
+  "n_unique": 8,
+  "n_dup_per": 4,
+  "n_train": 32,
+  "lora_r": 16
+}

@@ -1,0 +1,14 @@
+{
+  "ticket_id": "INC-7777",
+  "root_cause": "config_drift:payments.timeout_ms",
+  "actions": [
+    "set_config",
+    "restart_service"
+  ],
+  "evidence_log_ids": [
+    "B-3",
+    "B-15"
+  ],
+  "final_payments_health": "ok",
+  "final_timeout_ms": 9000
+}

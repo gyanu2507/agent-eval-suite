@@ -1,0 +1,17 @@
+tool=get_ticket args={"ticket_id": "INC-9999"} -> {"id": "INC-9999", "opened_ts": 7200, "service_hint": "api", "title": "auth retry storm"}
+tool=get_logs args={"service": "payments", "since_ts": 7200} -> [{"id": "D-17", "msg": "error timeout budget exhausted", "service": "payments", "ts": 7208}, {"id": "D-8", "msg": "warn timeout_ms=500 below SLO", "service": "payments", "ts": 7207}]
+tool=get_config args={"key": "payments.timeout_ms"} -> 500
+tool=set_config args={"key": "payments.timeout_ms", "value": 12000} -> {"key": "payments.timeout_ms", "ok": true, "value": 12000}
+tool=restart_service args={"service": "payments"} -> {"ok": true, "ready_at": 7205}
+tool=health args={"service": "payments"} -> {"ready_at": 7205, "status": "restarting"}
+tool=advance_clock args={"seconds": 1} -> {"now": 7201}
+tool=health args={"service": "payments"} -> {"ready_at": 7205, "status": "restarting"}
+tool=advance_clock args={"seconds": 1} -> {"now": 7202}
+tool=health args={"service": "payments"} -> {"ready_at": 7205, "status": "restarting"}
+tool=advance_clock args={"seconds": 1} -> {"now": 7203}
+tool=health args={"service": "payments"} -> {"ready_at": 7205, "status": "restarting"}
+tool=advance_clock args={"seconds": 1} -> {"now": 7204}
+tool=health args={"service": "payments"} -> {"ready_at": 7205, "status": "restarting"}
+tool=advance_clock args={"seconds": 1} -> {"now": 7205}
+tool=health args={"service": "payments"} -> {"status": "ok"}
+tool=submit_resolution args={"actions": ["set_config", "restart_service"], "evidence_log_ids": ["D-8", "D-17"], "root_cause": "config_drift:payments.timeout_ms", "ticket_id": "INC-9999"} -> {"accepted": true, "actions": ["set_config", "restart_service"], "evidence_log_ids": ["D-8", "D-17"], "final_payments_health": "ok", "final_timeout_ms": 12000, "root_cause": "config_drift:payments.timeout_ms", "submitted_at": 7205, "ticket_id": "INC-9999"}

@@ -15,3 +15,6 @@ experiments/sft/kaggle/output*/
 experiments/sft/kaggle/output/
 experiments/sft/kaggle-dpo/output*/
 experiments/sft/kaggle-dpo/output/
+experiments/sft/runs/gen-eval/*/
+experiments/sft/runs/gen-eval/*.log
+experiments/sft/runs/gen-eval/*.txt

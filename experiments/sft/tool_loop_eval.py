@@ -47,6 +47,98 @@ def format_tool_line(name: str, args: dict, result: object) -> str:
     )
 
 
+def format_call(name: str, args: dict) -> str:
+    return f"tool={name} args={json.dumps(args, sort_keys=True)}"
+
+
+def format_obs(result: object) -> str:
+    return f"OBS {json.dumps(result, sort_keys=True)}"
+
+
+def _first_line(text: str) -> str:
+    for piece in text.splitlines():
+        if piece.strip():
+            return piece.strip()
+    return ""
+
+
+def run_tool_loop_chat(
+    *,
+    model,
+    tok,
+    messages: list[dict],
+    desk,
+    max_steps: int = 24,
+    max_new_tokens: int = 192,
+    device: str = "cuda",
+) -> dict:
+    """Chat-turn tool loop: assistant=call only, user=OBS <json> with real desk result."""
+    import torch
+    from transformers import GenerationConfig
+
+    history = [dict(m) for m in messages]
+    calls: list[tuple[str, dict]] = []
+    errors: list[str] = []
+    raw_generations: list[str] = []
+    accepted: list[str] = []
+    cfg = GenerationConfig(
+        max_new_tokens=max_new_tokens,
+        do_sample=False,
+        pad_token_id=tok.eos_token_id,
+        eos_token_id=tok.eos_token_id,
+    )
+
+    for step in range(max_steps):
+        prompt = tok.apply_chat_template(
+            history, tokenize=False, add_generation_prompt=True
+        )
+        inputs = tok(prompt, return_tensors="pt").to(device)
+        with torch.no_grad():
+            out = model.generate(**inputs, generation_config=cfg)
+        new_text = tok.decode(
+            out[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
+        )
+        raw_generations.append(new_text)
+        line = _first_line(new_text)
+        if not line:
+            errors.append(f"empty_generation_step_{step}")
+            break
+        parsed = parse_tool_line(line)
+        if parsed is None:
+            errors.append(f"parse_fail_step_{step}:{line[:160]}")
+            break
+        name, args = parsed
+        fn = getattr(desk, name, None)
+        if fn is None:
+            errors.append(f"unknown_tool:{name}")
+            break
+        try:
+            result = fn(**args)
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{name}:{type(exc).__name__}:{exc}")
+            break
+
+        call = format_call(name, args)
+        obs = format_obs(result)
+        history.append({"role": "assistant", "content": call})
+        history.append({"role": "user", "content": obs})
+        accepted.append(format_tool_line(name, args, result))
+        calls.append((name, args))
+        if name == "submit_resolution":
+            break
+    else:
+        errors.append("max_steps")
+
+    return {
+        "accepted_lines": accepted,
+        "calls": calls,
+        "errors": errors,
+        "raw_generations": raw_generations,
+        "transcript": "\n".join(accepted) + ("\n" if accepted else ""),
+        "history": history,
+    }
+
+
 def run_tool_loop(
     *,
     model,
@@ -85,11 +177,7 @@ def run_tool_loop(
         )
         raw_generations.append(new_text)
         # First non-empty line only; ignore anything after (incl. hallucinated ->).
-        line = ""
-        for piece in new_text.splitlines():
-            if piece.strip():
-                line = piece.strip()
-                break
+        line = _first_line(new_text)
         if not line:
             errors.append(f"empty_generation_step_{step}")
             break
@@ -243,6 +331,62 @@ def eval_adapter_tool_loop(
     }
 
 
+def eval_adapter_tool_loop_chat(
+    *,
+    adapter: Path,
+    held_path: Path,
+    desk_app: Path,
+    out_dir: Path,
+    scenario_path: Path | None = None,
+    model_id: str = MODEL_ID,
+    max_steps: int = 24,
+) -> dict:
+    """Tool-loop decode matching step-SFT (assistant call / user OBS turns)."""
+    import torch
+    from peft import PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    sys.path.insert(0, str(desk_app))
+    from desk import Desk
+
+    held = json.loads(held_path.read_text())
+    messages = held["messages"]
+    scenario = scenario_path or (desk_app / "data" / "scenario.json")
+    ticket_id = json.loads(scenario.read_text())["ticket"]["id"]
+
+    tok = AutoTokenizer.from_pretrained(model_id)
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16)
+    model = PeftModel.from_pretrained(model, str(adapter))
+    model.to("cuda")
+    model.eval()
+
+    desk = Desk.from_scenario_path(scenario)
+    loop = run_tool_loop_chat(
+        model=model, tok=tok, messages=messages, desk=desk, max_steps=max_steps
+    )
+    gen = score_loop_result(
+        desk=desk,
+        scenario_path=scenario,
+        desk_app=desk_app,
+        out_dir=out_dir,
+        loop=loop,
+        ticket_id=ticket_id,
+    )
+    (out_dir / "history.json").write_text(json.dumps(loop.get("history") or [], indent=2) + "\n")
+    del model
+    torch.cuda.empty_cache()
+    return {
+        "generation": gen,
+        "n_steps": len(loop["calls"]),
+        "n_gen_chars": len(loop["transcript"]),
+        "scenario": str(scenario),
+        "ticket_id": ticket_id,
+        "decode": "tool_loop_chat",
+    }
+
+
 def _self_check() -> None:
     """Parse/format + oracle-style scripted loop without torch."""
     sys.path.insert(0, str(DEFAULT_DESK))
@@ -313,6 +457,12 @@ def _self_check() -> None:
     )
     out = score(scenario, audit, res)
     assert out["pass"], out
+
+    # Chat-turn formatting: assistant never carries observations.
+    call = format_call("get_logs", {"service": "payments", "since_ts": 1000})
+    obs = format_obs([{"id": "L-9"}])
+    assert " -> " not in call
+    assert obs.startswith("OBS ")
     print("self_check_ok", len(accepted))
 
 

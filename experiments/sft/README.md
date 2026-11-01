@@ -10,20 +10,27 @@ Single-ticket export (legacy smokes):
 python3 experiments/sft/export_trajectories.py
 ```
 
-Multi-scenario export (varied ticket / log-id prefixes; preferred for generalization):
+Multi-scenario export (varied ticket / log-id prefixes):
 
 ```bash
 python3 experiments/sft/build_multi_scenario.py
+```
+
+Step-level export (assistant = tool call only; user = `OBS …` with real desk results):
+
+```bash
+python3 experiments/sft/build_step_sft.py
 ```
 
 Writes `experiments/sft/data/`:
 
 - `oracle.jsonl` — single-ticket positive demos
 - `multi_oracle.jsonl` — 8 train tickets with distinct evidence id prefixes
+- `step_oracle.jsonl` — per-step SFT rows (no invented observations in assistant)
 - `scenario_shift.json` / `scenario_unseen.json` — holdouts (`INC-7777`, `INC-9999`)
 - `starter.jsonl` / `premature.jsonl` — rejected traces for DPO
 
-Each line is a chat-style record: system + user instruction + assistant tool-call transcript.
+Decode with interactive tool-loop: `experiments/sft/tool_loop_eval.py` (chat mode for step-SFT).
 
 ## Train (Colab / cloud)
 

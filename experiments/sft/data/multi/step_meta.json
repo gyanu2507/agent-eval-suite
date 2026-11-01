@@ -1,0 +1,190 @@
+{
+  "n_scenarios": 8,
+  "n_steps": 136,
+  "tickets": [
+    {
+      "ticket_id": "INC-2048",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3101",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3102",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3103",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3104",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3105",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3106",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    },
+    {
+      "ticket_id": "INC-3107",
+      "n_steps": 17,
+      "tools": [
+        "get_ticket",
+        "get_logs",
+        "get_config",
+        "set_config",
+        "restart_service",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "advance_clock",
+        "health",
+        "submit_resolution"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""Kaggle T4: DPO on top of green SFT, then verifier gen-eval."""
+"""Kaggle T4: light DPO continuing green SFT LoRA (no merge), then verifier eval."""
 
 from __future__ import annotations
 
@@ -76,14 +76,28 @@ def main() -> None:
     err = None
     rc = 0
     try:
-        train_dpo(sft_adapter, oracle_path, premature_path, OUT / "adapter")
+        # Sanity: green SFT alone must still pass before DPO.
         import importlib.util
 
-        green_py = REPO / "experiments" / "sft" / "kaggle-green" / "incident-desk-sft-green.py"
+        green_py = (
+            REPO / "experiments" / "sft" / "kaggle-green" / "incident-desk-sft-green.py"
+        )
         spec = importlib.util.spec_from_file_location("sft_green", green_py)
         assert spec and spec.loader
         green = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(green)
+
+        sft_check = green.eval_adapter(
+            adapter=sft_adapter,
+            held_path=held_path,
+            desk_app=desk_app,
+            out_dir=OUT / "eval_sft_baseline",
+        )
+        print("SFT_BASELINE", json.dumps(sft_check), flush=True)
+        if not sft_check.get("generation", {}).get("pass"):
+            raise RuntimeError("sft_green_baseline_not_passing")
+
+        train_dpo_continue_lora(sft_adapter, oracle_path, premature_path, OUT / "adapter")
 
         summary = green.eval_adapter(
             adapter=OUT / "adapter",
@@ -91,6 +105,7 @@ def main() -> None:
             desk_app=desk_app,
             out_dir=OUT / "eval",
         )
+        summary["sft_baseline"] = sft_check
         (OUT / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
         (WORK / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
         print("SUMMARY", json.dumps(summary), flush=True)
@@ -115,12 +130,13 @@ def main() -> None:
     raise SystemExit(rc)
 
 
-def train_dpo(
+def train_dpo_continue_lora(
     sft_adapter: Path, oracle_path: Path, premature_path: Path, adapter_out: Path
 ) -> None:
+    """Continue the green SFT LoRA with a tiny DPO step (no merge / new random LoRA)."""
     import torch
     from datasets import Dataset
-    from peft import LoraConfig, PeftModel
+    from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from trl import DPOConfig, DPOTrainer
 
@@ -133,25 +149,31 @@ def train_dpo(
     prompt = tok.apply_chat_template(
         chosen["messages"][:2], tokenize=False, add_generation_prompt=True
     )
-    chosen_txt = chosen["messages"][2]["content"]
-    rejected_txt = rejected["messages"][2]["content"]
     rows = [
-        {"prompt": prompt, "chosen": chosen_txt, "rejected": rejected_txt}
-        for _ in range(8)
+        {
+            "prompt": prompt,
+            "chosen": chosen["messages"][2]["content"],
+            "rejected": rejected["messages"][2]["content"],
+        }
+        for _ in range(4)
     ]
     ds = Dataset.from_list(rows)
 
-    # Merge green SFT into base, then attach a fresh LoRA for light DPO.
-    # Keep KL high and steps low so tool-trace behavior is not wiped.
-    base = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
-    merged = PeftModel.from_pretrained(base, str(sft_adapter))
-    merged = merged.merge_and_unload()
+    policy = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
+    policy = PeftModel.from_pretrained(policy, str(sft_adapter), is_trainable=True)
+
+    # Frozen SFT reference (same adapter weights, not trained).
+    ref = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
+    ref = PeftModel.from_pretrained(ref, str(sft_adapter), is_trainable=False)
+    ref.eval()
+    for p in ref.parameters():
+        p.requires_grad = False
 
     cfg_kwargs = {
         "output_dir": str(OUT / "trainer"),
         "num_train_epochs": 1,
         "per_device_train_batch_size": 1,
-        "learning_rate": 1e-5,
+        "learning_rate": 5e-6,
         "logging_steps": 1,
         "report_to": [],
         "save_strategy": "no",
@@ -167,11 +189,9 @@ def train_dpo(
     print("dpo_config_keys", sorted(cfg_kwargs), flush=True)
 
     trainer_kwargs = {
-        "model": merged,
+        "model": policy,
+        "ref_model": ref,
         "train_dataset": ds,
-        "peft_config": LoraConfig(
-            r=16, lora_alpha=32, lora_dropout=0.05, task_type="CAUSAL_LM"
-        ),
         "args": DPOConfig(**cfg_kwargs),
     }
     sig = inspect.signature(DPOTrainer.__init__).parameters
@@ -179,18 +199,19 @@ def train_dpo(
         trainer_kwargs["processing_class"] = tok
     elif "tokenizer" in sig:
         trainer_kwargs["tokenizer"] = tok
+    # model already has LoRA; do not pass peft_config
 
     trainer = DPOTrainer(**trainer_kwargs)
     train_out = trainer.train()
     adapter_out.mkdir(parents=True, exist_ok=True)
-    trainer.save_model(str(adapter_out))
+    policy.save_pretrained(str(adapter_out))
     metrics = {
         "train_loss": getattr(train_out, "training_loss", None),
         "epochs": 1,
-        "n_pairs": 8,
-        "lr": 1e-5,
+        "n_pairs": 4,
+        "lr": 5e-6,
         "beta": 0.5,
-        "init": "merge_sft_green",
+        "init": "continue_sft_lora_no_merge",
     }
     (OUT / "train_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     print("saved", adapter_out, metrics, flush=True)

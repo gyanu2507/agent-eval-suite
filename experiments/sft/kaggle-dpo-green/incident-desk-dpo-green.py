@@ -159,12 +159,14 @@ def train_dpo_continue_lora(
     ]
     ds = Dataset.from_list(rows)
 
+    # Policy: continue green SFT LoRA. Ref: merged SFT weights (plain CausalLM).
+    # TRL rejects PeftModel as ref_model, so merge a frozen copy for KL.
     policy = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
     policy = PeftModel.from_pretrained(policy, str(sft_adapter), is_trainable=True)
 
-    # Frozen SFT reference (same adapter weights, not trained).
     ref = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float16)
-    ref = PeftModel.from_pretrained(ref, str(sft_adapter), is_trainable=False)
+    ref = PeftModel.from_pretrained(ref, str(sft_adapter))
+    ref = ref.merge_and_unload()
     ref.eval()
     for p in ref.parameters():
         p.requires_grad = False
@@ -211,7 +213,7 @@ def train_dpo_continue_lora(
         "n_pairs": 4,
         "lr": 5e-6,
         "beta": 0.5,
-        "init": "continue_sft_lora_no_merge",
+        "init": "continue_sft_lora_ref_merged_sft",
     }
     (OUT / "train_metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     print("saved", adapter_out, metrics, flush=True)

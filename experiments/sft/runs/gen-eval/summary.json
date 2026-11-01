@@ -1,10 +1,10 @@
 {
   "base": {
     "preference": {
-      "nll_oracle": 0.6926892399787903,
-      "nll_premature": 0.9906514286994934,
+      "nll_oracle": 0.6924920678138733,
+      "nll_premature": 0.9904388785362244,
       "prefers_oracle": true,
-      "nll_gap_premature_minus_oracle": 0.2979621887207031
+      "nll_gap_premature_minus_oracle": 0.2979468107223511
     },
     "generation": {
       "pass": false,
@@ -17,10 +17,10 @@
   },
   "sft": {
     "preference": {
-      "nll_oracle": 0.6848171353340149,
-      "nll_premature": 0.9823630452156067,
+      "nll_oracle": 0.6852321028709412,
+      "nll_premature": 0.9822321534156799,
       "prefers_oracle": true,
-      "nll_gap_premature_minus_oracle": 0.2975459098815918
+      "nll_gap_premature_minus_oracle": 0.29700005054473877
     },
     "generation": {
       "pass": false,
@@ -33,15 +33,18 @@
   },
   "dpo": {
     "preference": {
-      "nll_oracle": 0.6925116181373596,
-      "nll_premature": 0.9907436370849609,
+      "nll_oracle": 0.6928104162216187,
+      "nll_premature": 0.9904474020004272,
       "prefers_oracle": true,
-      "nll_gap_premature_minus_oracle": 0.2982320189476013
+      "nll_gap_premature_minus_oracle": 0.2976369857788086
     },
     "generation": {
       "pass": false,
-      "error": "aborted_during_generation",
-      "n_calls_parsed": null
+      "checks": {},
+      "n_calls_parsed": 0,
+      "audit_len": null,
+      "replay_errors": [],
+      "error": "empty_audit"
     }
   }
 }

@@ -1,0 +1,57 @@
+{
+  "rc": 0,
+  "wall_s": 187.0,
+  "cuda": true,
+  "gpu": "Tesla T4",
+  "summary": {
+    "base": {
+      "preference": {
+        "nll_oracle": 0.6924920678138733,
+        "nll_premature": 0.9904388785362244,
+        "prefers_oracle": true,
+        "nll_gap_premature_minus_oracle": 0.2979468107223511
+      },
+      "generation": {
+        "pass": false,
+        "checks": {},
+        "n_calls_parsed": 0,
+        "audit_len": null,
+        "replay_errors": [],
+        "error": "empty_audit"
+      }
+    },
+    "sft": {
+      "preference": {
+        "nll_oracle": 0.6852321028709412,
+        "nll_premature": 0.9822321534156799,
+        "prefers_oracle": true,
+        "nll_gap_premature_minus_oracle": 0.29700005054473877
+      },
+      "generation": {
+        "pass": false,
+        "checks": {},
+        "n_calls_parsed": 0,
+        "audit_len": null,
+        "replay_errors": [],
+        "error": "empty_audit"
+      }
+    },
+    "dpo": {
+      "preference": {
+        "nll_oracle": 0.6928104162216187,
+        "nll_premature": 0.9904474020004272,
+        "prefers_oracle": true,
+        "nll_gap_premature_minus_oracle": 0.2976369857788086
+      },
+      "generation": {
+        "pass": false,
+        "checks": {},
+        "n_calls_parsed": 0,
+        "audit_len": null,
+        "replay_errors": [],
+        "error": "empty_audit"
+      }
+    }
+  },
+  "error": null
+}

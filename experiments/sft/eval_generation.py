@@ -120,11 +120,16 @@ def replay_and_score(calls: list[tuple[str, dict]], out_dir: Path) -> dict:
 
 
 def _load_model(model_id: str, adapter: Path | None):
-    # float32 on CPU/MPS: float16 on MPS produced early <|endoftext|> on this Mac.
-    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.float32)
+    if torch.cuda.is_available():
+        device = "cuda"
+        dtype = torch.float16
+    else:
+        # Prefer CPU over MPS for smoke eval; MPS float16 was unstable here.
+        device = "cpu"
+        dtype = torch.float32
+    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype)
     if adapter is not None:
         model = PeftModel.from_pretrained(model, str(adapter))
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
     model.to(device)
     model.eval()
     return model, device
@@ -132,8 +137,8 @@ def _load_model(model_id: str, adapter: Path | None):
 
 def _unload(model, device: str) -> None:
     del model
-    if device == "mps":
-        torch.mps.empty_cache()
+    if device == "cuda":
+        torch.cuda.empty_cache()
 
 
 def mean_nll(model, tok, prompt: str, completion: str, device: str) -> float:

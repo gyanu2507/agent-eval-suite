@@ -18,3 +18,4 @@ experiments/sft/kaggle-dpo/output/
 experiments/sft/runs/gen-eval/*/
 experiments/sft/runs/gen-eval/*.log
 experiments/sft/runs/gen-eval/*.txt
+experiments/sft/kaggle-eval/output*/

@@ -1,0 +1,7 @@
+{
+  "rc": 0,
+  "wall_s": 220.0,
+  "gpu": "Tesla T4",
+  "error": null,
+  "out": "/kaggle/working/heldout-shift"
+}

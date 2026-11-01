@@ -1,0 +1,20 @@
+{
+  "pass": false,
+  "checks": {
+    "root_cause": true,
+    "actions": true,
+    "evidence": false,
+    "timeout_restored": true,
+    "payments_ok": true,
+    "resolution_health": true,
+    "resolution_timeout": true,
+    "submitted": true
+  },
+  "expected_evidence": [
+    "Z-21",
+    "Z-22"
+  ],
+  "audit_len": 17,
+  "n_calls_parsed": 17,
+  "replay_errors": []
+}

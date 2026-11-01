@@ -1,0 +1,17 @@
+{"args": {"ticket_id": "INC-7777"}, "result": {"id": "INC-7777", "opened_ts": 2000, "service_hint": "api", "title": "billing retry storm"}, "tool": "get_ticket", "ts": 2000}
+{"args": {"service": "payments", "since_ts": 2000}, "result": [{"id": "E-11", "msg": "error timeout budget exhausted", "service": "payments", "ts": 2008}, {"id": "E-9", "msg": "warn timeout_ms=600 below SLO", "service": "payments", "ts": 2007}], "tool": "get_logs", "ts": 2000}
+{"args": {"key": "payments.timeout_ms"}, "result": 600, "tool": "get_config", "ts": 2000}
+{"args": {"key": "payments.timeout_ms", "value": 9000}, "result": {"key": "payments.timeout_ms", "ok": true, "value": 9000}, "tool": "set_config", "ts": 2000}
+{"args": {"service": "payments"}, "result": {"ok": true, "ready_at": 2005}, "tool": "restart_service", "ts": 2000}
+{"args": {"service": "payments"}, "result": {"ready_at": 2005, "status": "restarting"}, "tool": "health", "ts": 2000}
+{"args": {"seconds": 1}, "result": {"now": 2001}, "tool": "advance_clock", "ts": 2001}
+{"args": {"service": "payments"}, "result": {"ready_at": 2005, "status": "restarting"}, "tool": "health", "ts": 2001}
+{"args": {"seconds": 1}, "result": {"now": 2002}, "tool": "advance_clock", "ts": 2002}
+{"args": {"service": "payments"}, "result": {"ready_at": 2005, "status": "restarting"}, "tool": "health", "ts": 2002}
+{"args": {"seconds": 1}, "result": {"now": 2003}, "tool": "advance_clock", "ts": 2003}
+{"args": {"service": "payments"}, "result": {"ready_at": 2005, "status": "restarting"}, "tool": "health", "ts": 2003}
+{"args": {"seconds": 1}, "result": {"now": 2004}, "tool": "advance_clock", "ts": 2004}
+{"args": {"service": "payments"}, "result": {"ready_at": 2005, "status": "restarting"}, "tool": "health", "ts": 2004}
+{"args": {"seconds": 1}, "result": {"now": 2005}, "tool": "advance_clock", "ts": 2005}
+{"args": {"service": "payments"}, "result": {"status": "ok"}, "tool": "health", "ts": 2005}
+{"args": {"actions": ["set_config", "restart_service"], "evidence_log_ids": ["E-9", "E-11"], "root_cause": "config_drift:payments.timeout_ms", "ticket_id": "INC-7777"}, "result": {"accepted": true, "actions": ["set_config", "restart_service"], "evidence_log_ids": ["E-9", "E-11"], "final_payments_health": "ok", "final_timeout_ms": 9000, "root_cause": "config_drift:payments.timeout_ms", "submitted_at": 2005, "ticket_id": "INC-7777"}, "tool": "submit_resolution", "ts": 2005}

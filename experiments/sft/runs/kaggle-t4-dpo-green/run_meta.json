@@ -1,0 +1,52 @@
+{
+  "rc": 0,
+  "wall_s": 152.8,
+  "gpu": "Tesla T4",
+  "error": null,
+  "summary": {
+    "generation": {
+      "pass": true,
+      "checks": {
+        "root_cause": true,
+        "actions": true,
+        "evidence": true,
+        "timeout_restored": true,
+        "payments_ok": true,
+        "resolution_health": true,
+        "resolution_timeout": true,
+        "submitted": true
+      },
+      "expected_evidence": [
+        "L-9",
+        "L-11"
+      ],
+      "audit_len": 17,
+      "n_calls_parsed": 17,
+      "replay_errors": []
+    },
+    "n_gen_chars": 1885,
+    "sft_baseline": {
+      "generation": {
+        "pass": true,
+        "checks": {
+          "root_cause": true,
+          "actions": true,
+          "evidence": true,
+          "timeout_restored": true,
+          "payments_ok": true,
+          "resolution_health": true,
+          "resolution_timeout": true,
+          "submitted": true
+        },
+        "expected_evidence": [
+          "L-9",
+          "L-11"
+        ],
+        "audit_len": 17,
+        "n_calls_parsed": 17,
+        "replay_errors": []
+      },
+      "n_gen_chars": 1885
+    }
+  }
+}

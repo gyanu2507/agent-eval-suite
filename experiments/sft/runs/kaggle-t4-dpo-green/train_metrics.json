@@ -1,0 +1,8 @@
+{
+  "train_loss": 0.5205109715461731,
+  "epochs": 1,
+  "n_pairs": 4,
+  "lr": 5e-06,
+  "beta": 0.5,
+  "init": "continue_sft_lora_ref_merged_sft"
+}

@@ -1,32 +1,33 @@
 # Results
 
-| Run | Train GPU | Train wall | Train loss | Verifier gen | Prefers oracle | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| base instruct | — | — | — | fail (0 tools) | yes (gap ~0.30) | prior gen-eval |
-| SFT-LoRA smoke v1 | Kaggle T4 | 84.6 s | 5.011 | fail (0 tools) | yes | custom `<\|role\|>` format |
-| DPO-LoRA smoke | Kaggle T4 | 88.8 s | 0.693 | fail (0 tools) | yes | prior |
-| **SFT-LoRA green** | Kaggle T4 | 437.4 s | 0.012551155857568119 | **pass** (17/17 checks) | — | Qwen chat template, assistant-only loss, 20 ep × 32 dup, LoRA r=16 |
+| Run | Train GPU | Train wall | Train loss | Verifier gen | Notes |
+| --- | --- | --- | --- | --- | --- |
+| base instruct | — | — | — | fail (0 tools) | prior gen-eval |
+| SFT-LoRA smoke v1 | Kaggle T4 | 84.6 s | 5.011 | fail (0 tools) | raw `<\|role\|>` format |
+| DPO-LoRA smoke v1 | Kaggle T4 | 88.8 s | 0.693 | fail (0 tools) | prior |
+| **SFT-LoRA green** | Kaggle T4 | 437.4 s | 0.0126 | **pass** (17/17) | chat template, assistant-only, 20 ep |
+| **DPO-LoRA green** | Kaggle T4 | 152.8 s | 0.5205109715461731 | **pass** (17/17) | continue SFT LoRA, merged-SFT ref, 1 ep, β=0.5 |
 
-Green kernel: https://www.kaggle.com/code/gyanumayank/incident-desk-sft-green  
-Artifacts: `experiments/sft/runs/kaggle-t4-sft-green/`
+Kernels:
+- SFT green: https://www.kaggle.com/code/gyanumayank/incident-desk-sft-green
+- DPO green: https://www.kaggle.com/code/gyanumayank/incident-desk-dpo-green
 
-## What made verifier green
+Artifacts:
+- `experiments/sft/runs/kaggle-t4-sft-green/`
+- `experiments/sft/runs/kaggle-t4-dpo-green/`
 
-- Train with `apply_chat_template` (not raw `<\|role\|>` markers).
-- Loss only on assistant tokens.
-- Harder smoke: 20 epochs, 32 oracle duplicates, LoRA r=16.
-- Decode with the same chat template + greedy generation.
+## What stayed green under DPO
+
+- Continue the green SFT LoRA (`is_trainable=True`); do **not** merge then attach a fresh random LoRA.
+- Use a **merged SFT** checkpoint as `ref_model` (TRL rejects PeftModel refs).
+- Tiny step: 1 epoch, 4 pairs, lr `5e-6`, beta `0.5`.
+
+Merge+new-LoRA DPO (v1/v2) wiped tool traces even with gentle hparams.
 
 ## Ablations still open
 
 | Change | Effect |
 | --- | --- |
-| fewer epochs / smaller r | unknown |
-| DPO on top of green SFT | not run |
+| fewer SFT epochs / smaller r | unknown |
 | held-out ticket / scenario shift | not run |
-
-## Failure modes observed
-
-- Short v1 SFT/DPO smokes did not emit parseable `tool=` lines.
-- Do not run torch train/eval on the 8 GB Mac; use Kaggle.
-- Multi-GPU DPO needs `CUDA_VISIBLE_DEVICES=0`.
+| stronger DPO (more steps) while staying green | not run |

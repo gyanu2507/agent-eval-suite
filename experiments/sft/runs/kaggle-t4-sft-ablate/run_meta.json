@@ -1,0 +1,96 @@
+{
+  "rc": 0,
+  "wall_s": 516.7,
+  "gpu": "Tesla T4",
+  "error": null,
+  "out": "/kaggle/working/sft-ablate",
+  "summary": {
+    "baseline": {
+      "epochs": 20,
+      "lora_r": 16,
+      "n_dup": 32
+    },
+    "runs": {
+      "ep5_r16": {
+        "config": {
+          "name": "ep5_r16",
+          "epochs": 5,
+          "lora_r": 16,
+          "n_dup": 32
+        },
+        "train": {
+          "train_loss": 0.0509799190058402,
+          "epochs": 5,
+          "n_dup": 32,
+          "lora_r": 16
+        },
+        "eval": {
+          "generation": {
+            "pass": true,
+            "checks": {
+              "root_cause": true,
+              "actions": true,
+              "evidence": true,
+              "timeout_restored": true,
+              "payments_ok": true,
+              "resolution_health": true,
+              "resolution_timeout": true,
+              "submitted": true
+            },
+            "expected_evidence": [
+              "L-9",
+              "L-11"
+            ],
+            "audit_len": 17,
+            "n_calls_parsed": 17,
+            "replay_errors": []
+          },
+          "n_gen_chars": 1885,
+          "scenario": "/tmp/agent-eval-suite/tasks/incident-tool-desk/environment/app/data/scenario.json",
+          "ticket_id": "INC-2048"
+        },
+        "pass": true
+      },
+      "ep20_r8": {
+        "config": {
+          "name": "ep20_r8",
+          "epochs": 20,
+          "lora_r": 8,
+          "n_dup": 32
+        },
+        "train": {
+          "train_loss": 0.01917603586225596,
+          "epochs": 20,
+          "n_dup": 32,
+          "lora_r": 8
+        },
+        "eval": {
+          "generation": {
+            "pass": true,
+            "checks": {
+              "root_cause": true,
+              "actions": true,
+              "evidence": true,
+              "timeout_restored": true,
+              "payments_ok": true,
+              "resolution_health": true,
+              "resolution_timeout": true,
+              "submitted": true
+            },
+            "expected_evidence": [
+              "L-9",
+              "L-11"
+            ],
+            "audit_len": 17,
+            "n_calls_parsed": 17,
+            "replay_errors": []
+          },
+          "n_gen_chars": 1885,
+          "scenario": "/tmp/agent-eval-suite/tasks/incident-tool-desk/environment/app/data/scenario.json",
+          "ticket_id": "INC-2048"
+        },
+        "pass": true
+      }
+    }
+  }
+}

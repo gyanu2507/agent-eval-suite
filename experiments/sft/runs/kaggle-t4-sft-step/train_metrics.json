@@ -1,0 +1,9 @@
+{
+  "train_loss": 0.010090943355506027,
+  "epochs": 6,
+  "n_unique_steps": 136,
+  "n_dup": 2,
+  "n_train": 272,
+  "lora_r": 16,
+  "format": "assistant_call_user_obs"
+}

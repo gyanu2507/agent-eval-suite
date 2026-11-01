@@ -1,0 +1,115 @@
+[
+  [
+    "get_ticket",
+    {
+      "ticket_id": "INC-9999"
+    }
+  ],
+  [
+    "get_logs",
+    {
+      "service": "payments",
+      "since_ts": 5000
+    }
+  ],
+  [
+    "get_config",
+    {
+      "key": "payments.timeout_ms"
+    }
+  ],
+  [
+    "set_config",
+    {
+      "key": "payments.timeout_ms",
+      "value": 12000
+    }
+  ],
+  [
+    "restart_service",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "advance_clock",
+    {
+      "seconds": 1
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "advance_clock",
+    {
+      "seconds": 1
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "advance_clock",
+    {
+      "seconds": 1
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "advance_clock",
+    {
+      "seconds": 1
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "advance_clock",
+    {
+      "seconds": 1
+    }
+  ],
+  [
+    "health",
+    {
+      "service": "payments"
+    }
+  ],
+  [
+    "submit_resolution",
+    {
+      "actions": [
+        "set_config",
+        "restart_service"
+      ],
+      "evidence_log_ids": [
+        "Z-21",
+        "Z-22"
+      ],
+      "root_cause": "config_drift:payments.timeout_ms",
+      "ticket_id": "INC-9999"
+    }
+  ]
+]

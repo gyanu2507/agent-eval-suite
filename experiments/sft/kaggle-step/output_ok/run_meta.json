@@ -1,0 +1,114 @@
+{
+  "rc": 0,
+  "wall_s": 727.5,
+  "gpu": "Tesla T4",
+  "error": null,
+  "out": "/kaggle/working/sft-step",
+  "summary": {
+    "train": {
+      "train_loss": 0.010090943355506027,
+      "epochs": 6,
+      "n_unique_steps": 136,
+      "n_dup": 2,
+      "n_train": 272,
+      "lora_r": 16,
+      "format": "assistant_call_user_obs"
+    },
+    "evals": {
+      "train_ticket": {
+        "result": {
+          "generation": {
+            "pass": true,
+            "checks": {
+              "root_cause": true,
+              "actions": true,
+              "evidence": true,
+              "timeout_restored": true,
+              "payments_ok": true,
+              "resolution_health": true,
+              "resolution_timeout": true,
+              "submitted": true
+            },
+            "expected_evidence": [
+              "L-9",
+              "L-11"
+            ],
+            "audit_len": 17,
+            "n_calls_parsed": 17,
+            "replay_errors": []
+          },
+          "n_steps": 17,
+          "n_gen_chars": 1886,
+          "scenario": "/tmp/agent-eval-suite/tasks/incident-tool-desk/environment/app/data/scenario.json",
+          "ticket_id": "INC-2048",
+          "decode": "tool_loop_chat"
+        },
+        "pass": true
+      },
+      "shift_ticket": {
+        "result": {
+          "generation": {
+            "pass": true,
+            "checks": {
+              "root_cause": true,
+              "actions": true,
+              "evidence": true,
+              "timeout_restored": true,
+              "payments_ok": true,
+              "resolution_health": true,
+              "resolution_timeout": true,
+              "submitted": true
+            },
+            "expected_evidence": [
+              "E-9",
+              "E-11"
+            ],
+            "audit_len": 17,
+            "n_calls_parsed": 17,
+            "replay_errors": []
+          },
+          "n_steps": 17,
+          "n_gen_chars": 1883,
+          "scenario": "/tmp/agent-eval-suite/experiments/sft/data/scenario_shift.json",
+          "ticket_id": "INC-7777",
+          "decode": "tool_loop_chat"
+        },
+        "pass": true
+      },
+      "unseen_ticket": {
+        "result": {
+          "generation": {
+            "pass": true,
+            "checks": {
+              "root_cause": true,
+              "actions": true,
+              "evidence": true,
+              "timeout_restored": true,
+              "payments_ok": true,
+              "resolution_health": true,
+              "resolution_timeout": true,
+              "submitted": true
+            },
+            "expected_evidence": [
+              "Z-21",
+              "Z-22"
+            ],
+            "audit_len": 17,
+            "n_calls_parsed": 17,
+            "replay_errors": []
+          },
+          "n_steps": 17,
+          "n_gen_chars": 1887,
+          "scenario": "/tmp/agent-eval-suite/experiments/sft/data/scenario_unseen.json",
+          "ticket_id": "INC-9999",
+          "decode": "tool_loop_chat"
+        },
+        "pass": true
+      }
+    },
+    "train_pass": true,
+    "shift_pass": true,
+    "unseen_pass": true,
+    "decode": "tool_loop_chat"
+  }
+}

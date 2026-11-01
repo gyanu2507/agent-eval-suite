@@ -1,0 +1,19 @@
+[
+  "tool=get_ticket args={\"ticket_id\": \"INC-2048\"}",
+  "tool=get_logs args={\"service\": \"payments\", \"since_ts\": 1000}",
+  "tool=get_config args={\"key\": \"payments.timeout_ms\"}",
+  "tool=set_config args={\"key\": \"payments.timeout_ms\", \"value\": 5000}",
+  "tool=restart_service args={\"service\": \"payments\"}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=advance_clock args={\"seconds\": 1}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=advance_clock args={\"seconds\": 1}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=advance_clock args={\"seconds\": 1}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=advance_clock args={\"seconds\": 1}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=advance_clock args={\"seconds\": 1}",
+  "tool=health args={\"service\": \"payments\"}",
+  "tool=submit_resolution args={\"actions\": [\"set_config\", \"restart_service\"], \"evidence_log_ids\": [\"L-9\", \"L-11\"], \"root_cause\": \"config_drift:payments.timeout_ms\", \"ticket_id\": \"INC-2048\"}"
+]

@@ -7,17 +7,17 @@ __pycache__/
 venv/
 *.egg-info/
 .DS_Store
+*.log
+
 tasks/*/environment/app/artifacts/
 tasks/*/environment/app/clearing_state.json
-*.log
-tasks/*/environment/app/artifacts/
-experiments/sft/kaggle/output*/
-experiments/sft/kaggle/output/
-experiments/sft/kaggle-dpo/output*/
-experiments/sft/kaggle-dpo/output/
+
+# Kaggle kernel download dumps (canonical artifacts live under experiments/sft/runs/)
+experiments/sft/kaggle*/output*/
+experiments/sft/kaggle*/output/
+experiments/sft/kaggle*/watch.log
+
+# Local gen-eval scratch under the old layout
 experiments/sft/runs/gen-eval/*/
 experiments/sft/runs/gen-eval/*.log
 experiments/sft/runs/gen-eval/*.txt
-experiments/sft/kaggle-eval/output*/
-experiments/sft/kaggle-green/output*/
-experiments/sft/kaggle-dpo-green/output*/

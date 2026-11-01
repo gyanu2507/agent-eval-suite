@@ -20,3 +20,4 @@ experiments/sft/runs/gen-eval/*.log
 experiments/sft/runs/gen-eval/*.txt
 experiments/sft/kaggle-eval/output*/
 experiments/sft/kaggle-green/output*/
+experiments/sft/kaggle-dpo-green/output*/

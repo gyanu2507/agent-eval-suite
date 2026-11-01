@@ -218,7 +218,12 @@ def parse_tool_calls(text: str) -> list[tuple[str, dict]]:
 
 
 def eval_adapter(
-    *, adapter: Path, held_path: Path, desk_app: Path, out_dir: Path
+    *,
+    adapter: Path,
+    held_path: Path,
+    desk_app: Path,
+    out_dir: Path,
+    scenario_path: Path | None = None,
 ) -> dict:
     import torch
     from peft import PeftModel
@@ -258,7 +263,8 @@ def eval_adapter(
     from desk import Desk
     from verifier import score
 
-    scenario = desk_app / "data" / "scenario.json"
+    scenario = scenario_path or (desk_app / "data" / "scenario.json")
+    ticket_id = json.loads(scenario.read_text())["ticket"]["id"]
     desk = Desk.from_scenario_path(scenario)
     errors: list[str] = []
     for name, args in calls:
@@ -281,7 +287,7 @@ def eval_adapter(
     submitted = desk._submitted
     if submitted is None:
         resolution = {
-            "ticket_id": "INC-2048",
+            "ticket_id": ticket_id,
             "root_cause": "",
             "actions": [],
             "evidence_log_ids": [],
@@ -312,7 +318,14 @@ def eval_adapter(
         gen["n_calls_parsed"] = len(calls)
         gen["replay_errors"] = errors
     (out_dir / "verifier_score.json").write_text(json.dumps(gen, indent=2) + "\n")
-    return {"generation": gen, "n_gen_chars": len(text)}
+    del model
+    torch.cuda.empty_cache()
+    return {
+        "generation": gen,
+        "n_gen_chars": len(text),
+        "scenario": str(scenario),
+        "ticket_id": ticket_id,
+    }
 
 
 if __name__ == "__main__":

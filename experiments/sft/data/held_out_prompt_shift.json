@@ -1,0 +1,12 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an incident-response policy. Call desk tools to resolve INC-7777. Obey the instruction. Prefer numeric log timestamps and wait for health ok."
+    },
+    {
+      "role": "user",
+      "content": "# Incident Tool Desk\n\nLong-horizon ops desk. A policy must resolve ticket `INC-7777` by calling tools on the desk under `environment/app`. Time comes only from the injected `Clock`. Do not modify `data/scenario.json`.\n\n## Goal\n\nProduce:\n\n- `artifacts/audit.jsonl` — one JSON object per tool call, in order\n- `artifacts/resolution.json` — final resolution record\n\nThe verifier **replays** `audit.jsonl` against a fresh desk and checks final service/config health plus resolution fields. Hand-writing a pretty `resolution.json` without a valid audit does not pass.\n\n## Tools (via `Desk`)\n\n- `list_services()`\n- `get_ticket(ticket_id)`\n- `get_logs(service, since_ts)` — `since_ts` is an integer logical time\n- `get_config(key)`\n- `set_config(key, value)`\n- `restart_service(service)`\n- `health(service)` — `ok` only after restart settles (see clock rule)\n- `advance_clock(seconds)` — only way time moves\n- `submit_resolution(ticket_id, root_cause, actions, evidence_log_ids)`\n\n## Rules\n\n1. Sort / filter logs by **numeric** timestamp, never lexicographic string order.\n2. Root cause for `INC-7777` is config drift on `payments.timeout_ms` (too low), not the first error line in `api` logs.\n3. Fix order: restore config to the scenario baseline, restart `payments`, advance clock until `health(\"payments\")` is `ok`, then submit.\n4. `submit_resolution` must list the evidence log line ids that mention `timeout` **and** `payments` (ids from `get_logs`).\n5. Do not edit `data/scenario.json`.\n6. Do not call `submit_resolution` before payments health is `ok`.\n\n## Output schema (`resolution.json`)\n\n```json\n{\n  \"ticket_id\": \"INC-7777\",\n  \"root_cause\": \"config_drift:payments.timeout_ms\",\n  \"actions\": [\"set_config\", \"restart_service\"],\n  \"evidence_log_ids\": [\"...\", \"...\"],\n  \"final_payments_health\": \"ok\",\n  \"final_timeout_ms\": 9000\n}\n```"
+    }
+  ]
+}

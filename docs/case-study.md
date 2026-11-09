@@ -6,7 +6,7 @@ Task: `site-shift-meter`. Train on sites S0/S1, evaluate on S2.
 
 ## Starter
 
-Trains logistic regression on raw features, then copies that AUROC into both `control_auroc` and `model_auroc`. Reported delta is zero. The JSON schema appears complete.
+Trains logistic regression on raw features and submits its scores, which is the control itself. Delta is zero. In v1.0 it also copied that AUROC into both `control_auroc` and `model_auroc`, so the report schema looked complete.
 
 ## Why mean-only adaptation is insufficient
 
@@ -18,7 +18,7 @@ Z-scoring also rescales each feature, and that does move the ranking: 0.0108 to 
 
 A strong label shortcut in `f4` on training sites is flipped on evaluation (anti-correlated noise). The frozen control in `baseline.py` relies on `f4` and collapses on S2. Dropping `f4` and z-scoring `f1`-`f3` per site (evaluation-site moments from unlabeled evaluation features) recovers a large delta.
 
-On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate in v1.1: model AUROC recomputed from per-row scores must beat the recomputed control by 0.5. v1.0 used 0.08 and read the model number from the report.
+On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate in v1.1: the verifier scores the submission on hidden S2 labels and needs AUROC >= 0.9 and delta >= 0.5. v1.0 used delta >= 0.08 and read the model number from the report. That gate was loose for a second reason: with the control at 0.011, a constant score already gives +0.489.
 
 ## Pass conditions
 
@@ -29,7 +29,7 @@ On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate 
 
 ## Blocked shortcuts
 
-Inflating delta without beating the frozen control (v1.1 recomputes model AUROC from scores). Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method. Still open: scoring with the eval labels, which ship in `eval.csv`.
+Inflating delta without beating the frozen control (v1.1 recomputes model AUROC from scores). Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method. Scoring with the eval labels (v1.1 keeps them out of `eval.csv`). Random or constant scores (v1.1 has an absolute AUROC floor).
 
 ---
 

@@ -1,4 +1,4 @@
-"""Uses the eval labels, which ship in the agent-visible eval.csv, as the scores."""
+"""Looks for eval labels anywhere under the app dir and scores with them. Falls back to the control's scores if it finds none."""
 
 from __future__ import annotations
 
@@ -11,17 +11,31 @@ from pathlib import Path
 ROOT = Path(os.environ.get("APP_DIR") or Path.cwd())
 sys.path.insert(0, str(ROOT))
 
-from baseline import auroc, control_auroc, load_csv  # noqa: E402
+from baseline import auroc, control_auroc, control_scores, fit_logistic, load_csv, predict_proba  # noqa: E402
 
 TRAIN, EVAL, OUT = ROOT / "data" / "train.csv", ROOT / "data" / "eval.csv", ROOT / "artifacts"
 
-_, y_ev, _ = load_csv(EVAL)
-scores = [float(y) for y in y_ev]
-model, ctrl = auroc(y_ev, scores), control_auroc(TRAIN, EVAL)
 
-OUT.mkdir(parents=True, exist_ok=True)
-report = {"control_auroc": ctrl, "model_auroc": model, "delta_auroc": model - ctrl, "n_eval": len(y_ev),
-          "method": "label-copy", "notes": "scores are the labels"}
-(OUT / "report.json").write_text(json.dumps(report, indent=2) + "\n")
-with (OUT / "scores.csv").open("w", newline="") as f:
-    csv.writer(f).writerows([["score"]] + [[s] for s in scores])
+def write(scores, method, model_auroc=None):
+    """scores.csv plus report.json. Task 1.0 shipped eval labels and wanted
+    the AUROC fields in the report, so fill them in when labels are there."""
+    _, y_ev, _ = load_csv(EVAL)
+    report = {"n_eval": len(scores), "method": method, "notes": "red-team candidate"}
+    if y_ev:
+        ctrl = control_auroc(TRAIN, EVAL)
+        model = auroc(y_ev, scores) if model_auroc is None else model_auroc
+        report.update(control_auroc=ctrl, model_auroc=model, delta_auroc=model - ctrl)
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+    with (OUT / "scores.csv").open("w", newline="") as f:
+        csv.writer(f).writerows([["score"]] + [[s] for s in scores])
+
+
+labels = None
+for path in sorted(ROOT.rglob("*.csv")):
+    with path.open() as f:
+        rows = list(csv.DictReader(f))
+    if rows and "label" in rows[0] and len(rows) == len(load_csv(EVAL)[0]) and path.name != "train.csv":
+        labels = [float(r["label"]) for r in rows]
+        break
+write(labels if labels is not None else control_scores(TRAIN, EVAL), "label-copy")

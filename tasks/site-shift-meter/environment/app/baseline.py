@@ -10,6 +10,8 @@ FEATURES = ("f1", "f2", "f3", "f4")
 
 
 def load_csv(path: Path) -> tuple[list[list[float]], list[int], list[str]]:
+    """Features, labels and sites. Labels come back empty when the file has
+    no label column, which is the case for eval.csv since v1.1."""
     xs: list[list[float]] = []
     ys: list[int] = []
     sites: list[str] = []
@@ -17,9 +19,15 @@ def load_csv(path: Path) -> tuple[list[list[float]], list[int], list[str]]:
         reader = csv.DictReader(f)
         for row in reader:
             xs.append([float(row[c]) for c in FEATURES])
-            ys.append(int(row["label"]))
+            if "label" in row:
+                ys.append(int(row["label"]))
             sites.append(row["site"])
     return xs, ys, sites
+
+
+def load_labels(path: Path) -> list[int]:
+    with path.open() as f:
+        return [int(row["label"]) for row in csv.DictReader(f)]
 
 
 def _sigmoid(z: float) -> float:
@@ -87,9 +95,14 @@ def auroc(ys: list[int], scores: list[float]) -> float:
     return (rank_sum - n_pos * (n_pos + 1) / 2.0) / (n_pos * n_neg)
 
 
-def control_auroc(train_path: Path, eval_path: Path) -> float:
+def control_scores(train_path: Path, eval_path: Path) -> list[float]:
     x_tr, y_tr, _ = load_csv(train_path)
-    x_ev, y_ev, _ = load_csv(eval_path)
-    weights = fit_logistic(x_tr, y_tr)
-    scores = predict_proba(weights, x_ev)
-    return auroc(y_ev, scores)
+    x_ev, _, _ = load_csv(eval_path)
+    return predict_proba(fit_logistic(x_tr, y_tr), x_ev)
+
+
+def control_auroc(train_path: Path, eval_path: Path, labels: list[int] | None = None) -> float:
+    """AUROC of the frozen control. Pass the eval labels when eval.csv has none."""
+    if labels is None:
+        _, labels, _ = load_csv(eval_path)
+    return auroc(labels, control_scores(train_path, eval_path))

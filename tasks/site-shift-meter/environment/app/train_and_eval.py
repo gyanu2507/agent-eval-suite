@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Broken starter: reports control as the model (delta 0)."""
+"""Broken starter: submits the control model's own scores (delta 0)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 
-from baseline import control_auroc, fit_logistic, load_csv, predict_proba
+from baseline import control_auroc, control_scores, load_csv
 
 ROOT = Path(os.environ.get("APP_DIR") or Path(__file__).resolve().parent)
 TRAIN = ROOT / "data" / "train.csv"
@@ -17,18 +17,16 @@ OUT = ROOT / "artifacts" / "report.json"
 
 
 def main() -> None:
-    ctrl = control_auroc(TRAIN, EVAL)
-    x_tr, y_tr, _ = load_csv(TRAIN)
     x_ev, y_ev, _ = load_csv(EVAL)
-    scores = predict_proba(fit_logistic(x_tr, y_tr), x_ev)  # BUG: this is just the control model
+    scores = control_scores(TRAIN, EVAL)  # BUG: this is the control model, unchanged
     report = {
-        "control_auroc": ctrl,
-        "model_auroc": ctrl,  # BUG: no improvement attempted
-        "delta_auroc": 0.0,
-        "n_eval": len(y_ev),
+        "n_eval": len(x_ev),
         "method": "control-copy",
-        "notes": "starter copies the control score",
+        "notes": "starter submits the control model's scores",
     }
+    if y_ev:  # task 1.0 shipped eval labels and asked for these three fields
+        ctrl = control_auroc(TRAIN, EVAL)
+        report.update(control_auroc=ctrl, model_auroc=ctrl, delta_auroc=0.0)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2) + "\n")
     with (OUT.parent / "scores.csv").open("w", newline="") as f:

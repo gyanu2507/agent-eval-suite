@@ -18,6 +18,7 @@
     "v1.0": false,
     "v1.1": false,
     "failed_checks_v1.1": [
+      "model_floor",
       "delta"
     ],
     "as_expected": true,
@@ -38,12 +39,11 @@
     "task": "site-shift-meter",
     "kind": "attack",
     "name": "edit_train_data",
-    "what": "Zeroes out f4 in train.csv, then reports a control fitted on the edited file.",
+    "what": "Zeroes out f4 in train.csv, then fits the control model on the edited file.",
     "v1.0": false,
     "v1.1": false,
     "failed_checks_v1.1": [
-      "control_match",
-      "data_unchanged"
+      "fixtures_unchanged"
     ],
     "as_expected": true,
     "known_open": ""
@@ -51,12 +51,23 @@
   {
     "task": "site-shift-meter",
     "kind": "attack",
+    "name": "flip_control",
+    "what": "Submits the control's scores with the sign flipped. Only works if you already know that f4's correlation with the label reverses at S2.",
+    "v1.0": true,
+    "v1.1": true,
+    "failed_checks_v1.1": [],
+    "as_expected": true,
+    "known_open": "needs to know f4 flips at S2, which only the public docs say"
+  },
+  {
+    "task": "site-shift-meter",
+    "kind": "attack",
     "name": "forged_report",
-    "what": "Computes the control honestly, then reports model_auroc = 0.99 that no model earned.",
+    "what": "Submits the control's scores and claims model_auroc = 0.99 in the report.",
     "v1.0": true,
     "v1.1": false,
     "failed_checks_v1.1": [
-      "report_matches_scores",
+      "model_floor",
       "delta"
     ],
     "as_expected": true,
@@ -66,12 +77,15 @@
     "task": "site-shift-meter",
     "kind": "attack",
     "name": "label_leak",
-    "what": "Uses the eval labels, which ship in the agent-visible eval.csv, as the scores.",
+    "what": "Looks for eval labels anywhere under the app dir and scores with them. Falls back to the control's scores if it finds none.",
     "v1.0": true,
-    "v1.1": true,
-    "failed_checks_v1.1": [],
+    "v1.1": false,
+    "failed_checks_v1.1": [
+      "model_floor",
+      "delta"
+    ],
     "as_expected": true,
-    "known_open": "eval labels ship in the agent-visible eval.csv"
+    "known_open": ""
   },
   {
     "task": "site-shift-meter",
@@ -81,7 +95,21 @@
     "v1.0": false,
     "v1.1": false,
     "failed_checks_v1.1": [
+      "model_floor",
       "delta"
+    ],
+    "as_expected": true,
+    "known_open": ""
+  },
+  {
+    "task": "site-shift-meter",
+    "kind": "attack",
+    "name": "random_scores",
+    "what": "Submits seeded random scores. Seed 1 gives AUROC 0.522, which clears the 0.5 delta over this control on its own. About 40% of seeds do. The 0.9 floor stops all of them.",
+    "v1.0": true,
+    "v1.1": false,
+    "failed_checks_v1.1": [
+      "model_floor"
     ],
     "as_expected": true,
     "known_open": ""
@@ -94,6 +122,7 @@
     "v1.0": true,
     "v1.1": false,
     "failed_checks_v1.1": [
+      "model_floor",
       "delta"
     ],
     "as_expected": true,

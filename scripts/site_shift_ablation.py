@@ -18,7 +18,7 @@ TASK = REPO / "tasks" / "site-shift-meter"
 APP = TASK / "environment" / "app"
 sys.path.insert(0, str(APP))
 
-from baseline import auroc, control_auroc, fit_logistic, load_csv, predict_proba  # noqa: E402
+from baseline import auroc, control_auroc, fit_logistic, load_csv, load_labels, predict_proba  # noqa: E402
 
 _spec = importlib.util.spec_from_file_location("oracle", TASK / "solution" / "train_and_eval.py")
 oracle = importlib.util.module_from_spec(_spec)
@@ -26,8 +26,9 @@ _spec.loader.exec_module(oracle)
 
 TRAIN = APP / "data" / "train.csv"
 EVAL = APP / "data" / "eval.csv"
+LABELS = TASK / "tests" / "eval_labels.csv"
 OUT_DIR = REPO / "docs" / "figures"
-GATE = 0.5  # v1.1 gate, see tasks/site-shift-meter/CALIBRATION.md
+DELTA, FLOOR = 0.5, 0.9  # v1.1 gate, see tasks/site-shift-meter/CALIBRATION.md
 
 
 def _zscore(x_tr, s_tr, x_ev, s_ev):
@@ -55,12 +56,14 @@ def _fit_eval(x_tr, y_tr, x_ev, y_ev) -> float:
 
 def main() -> None:
     x_tr, y_tr, s_tr = load_csv(TRAIN)
-    x_ev, y_ev, s_ev = load_csv(EVAL)
+    x_ev, _, s_ev = load_csv(EVAL)
+    y_ev = load_labels(LABELS)
     keep = [0, 1, 2]
-    ctrl = control_auroc(TRAIN, EVAL)
+    ctrl = control_auroc(TRAIN, EVAL, y_ev)
 
     rows = [("Frozen control (all features, raw)", ctrl)]
-    rows.append(("Starter: copy control into model field", ctrl))
+    rows.append(("Starter: submit the control's own scores", ctrl))
+    rows.append(("Constant score for every row", auroc(y_ev, [0.5] * len(y_ev))))
     ct, ce = _center(x_tr, s_tr), _center(x_ev, s_ev)
     rows.append(("Mean-only: per-site centering, keeps f4", _fit_eval(ct, y_tr, ce, y_ev)))
     zt, ze = _zscore(x_tr, s_tr, x_ev, s_ev)
@@ -70,11 +73,11 @@ def main() -> None:
     rows.append(("Oracle: drop f4 + per-site z-score", _fit_eval(zt, y_tr, ze, y_ev)))
 
     result = [
-        {"method": m, "eval_auroc": round(a, 4), "delta_vs_control": round(a - ctrl, 4), "passes_gate": a - ctrl >= GATE}
+        {"method": m, "eval_auroc": round(a, 4), "delta_vs_control": round(a - ctrl, 4), "passes_gate": a >= FLOOR and a - ctrl >= DELTA}
         for m, a in rows
     ]
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / "site-shift-ablation.json").write_text(json.dumps({"gate": GATE, "n_eval": len(y_ev), "rows": result}, indent=2) + "\n")
+    (OUT_DIR / "site-shift-ablation.json").write_text(json.dumps({"gate": {"min_auroc": FLOOR, "min_delta": DELTA}, "n_eval": len(y_ev), "rows": result}, indent=2) + "\n")
     (OUT_DIR / "site-shift-ablation.svg").write_text(_svg(result))
     for r in result:
         print(f"{r['eval_auroc']:.4f}  delta {r['delta_vs_control']:+.4f}  {'PASS' if r['passes_gate'] else 'fail'}  {r['method']}")
@@ -88,14 +91,14 @@ def _svg(rows) -> str:
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13">',
         '<style>.t{fill:#24292f}.m{fill:#57606a}.pass{fill:#1a7f37}.fail{fill:#afb8c1}.ax{stroke:#d0d7de}'
         '@media (prefers-color-scheme:dark){.t{fill:#e6edf3}.m{fill:#9198a1}.pass{fill:#3fb950}.fail{fill:#484f58}.ax{stroke:#30363d}}</style>',
-        f'<text class="t" x="0" y="20" font-weight="600" font-size="15">site-shift-meter: eval AUROC by method (n=180, gate = control + {GATE})</text>',
+        f'<text class="t" x="0" y="20" font-weight="600" font-size="15">site-shift-meter: eval AUROC by method (n=180, gate: AUROC &gt;= {FLOOR} and control + {DELTA})</text>',
     ]
     ctrl = rows[0]["eval_auroc"]
     for frac in (0, 0.25, 0.5, 0.75, 1.0):
         x = left + frac * plot_w
         out.append(f'<line class="ax" x1="{x:.1f}" y1="{top - 8}" x2="{x:.1f}" y2="{h - 30}"/>')
         out.append(f'<text class="m" x="{x:.1f}" y="{h - 12}" text-anchor="middle">{frac:.2f}</text>')
-    gx = left + (ctrl + GATE) * plot_w
+    gx = left + max(FLOOR, ctrl + DELTA) * plot_w
     out.append(f'<line x1="{gx:.1f}" y1="{top - 8}" x2="{gx:.1f}" y2="{h - 30}" stroke="#cf222e" stroke-dasharray="4 3"/>')
     out.append(f'<text x="{gx + 4:.1f}" y="{top - 12}" fill="#cf222e" font-size="12">gate</text>')
     for i, r in enumerate(rows):

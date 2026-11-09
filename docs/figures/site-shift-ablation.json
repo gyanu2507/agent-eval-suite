@@ -1,5 +1,8 @@
 {
-  "gate": 0.5,
+  "gate": {
+    "min_auroc": 0.9,
+    "min_delta": 0.5
+  },
   "n_eval": 180,
   "rows": [
     {
@@ -9,9 +12,15 @@
       "passes_gate": false
     },
     {
-      "method": "Starter: copy control into model field",
+      "method": "Starter: submit the control's own scores",
       "eval_auroc": 0.0108,
       "delta_vs_control": 0.0,
+      "passes_gate": false
+    },
+    {
+      "method": "Constant score for every row",
+      "eval_auroc": 0.5,
+      "delta_vs_control": 0.4892,
       "passes_gate": false
     },
     {

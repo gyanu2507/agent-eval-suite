@@ -30,7 +30,7 @@ TASKS = {
 
 # Holes v1.1 does not close yet. They are expected to pass and are listed as open.
 KNOWN_OPEN = {
-    ("site-shift-meter", "label_leak"): "eval labels ship in the agent-visible eval.csv",
+    ("site-shift-meter", "flip_control"): "needs to know f4 flips at S2, which only the public docs say",
 }
 
 

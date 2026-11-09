@@ -87,17 +87,14 @@ def main() -> None:
 
     weights = fit_logistic(x_tr_z, y_tr, lr=0.08, epochs=700)
     scores = predict_proba(weights, x_ev_z)
-    model = auroc(y_ev, scores)
-    ctrl = control_auroc(TRAIN, EVAL)
-
     report = {
-        "control_auroc": ctrl,
-        "model_auroc": model,
-        "delta_auroc": model - ctrl,
-        "n_eval": len(y_ev),
+        "n_eval": len(x_ev),
         "method": "drop-f4-site-zscore-logistic",
-        "notes": "ignore spurious f4; z-score f1-f3 per site including unlabeled eval",
+        "notes": "ignore spurious f4, z-score f1-f3 per site including unlabeled eval",
     }
+    if y_ev:  # task 1.0 shipped eval labels and asked for these three fields
+        ctrl, model = control_auroc(TRAIN, EVAL), auroc(y_ev, scores)
+        report.update(control_auroc=ctrl, model_auroc=model, delta_auroc=model - ctrl)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2) + "\n")
     with (OUT.parent / "scores.csv").open("w", newline="") as f:

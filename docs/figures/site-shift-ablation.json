@@ -1,0 +1,42 @@
+{
+  "gate": 0.08,
+  "n_eval": 180,
+  "rows": [
+    {
+      "method": "Frozen control (all features, raw)",
+      "eval_auroc": 0.0108,
+      "delta_vs_control": 0.0,
+      "passes_gate": false
+    },
+    {
+      "method": "Starter: copy control into model field",
+      "eval_auroc": 0.0108,
+      "delta_vs_control": 0.0,
+      "passes_gate": false
+    },
+    {
+      "method": "Mean-only: per-site centering, keeps f4",
+      "eval_auroc": 0.0107,
+      "delta_vs_control": -0.0001,
+      "passes_gate": false
+    },
+    {
+      "method": "Per-site z-score, keeps f4",
+      "eval_auroc": 0.1068,
+      "delta_vs_control": 0.0959,
+      "passes_gate": true
+    },
+    {
+      "method": "Drop shortcut f4, no adaptation",
+      "eval_auroc": 0.9766,
+      "delta_vs_control": 0.9658,
+      "passes_gate": true
+    },
+    {
+      "method": "Oracle: drop f4 + per-site z-score",
+      "eval_auroc": 0.9766,
+      "delta_vs_control": 0.9658,
+      "passes_gate": true
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-11-09)
 
 Red team and verifier fixes. Every task moves from version 1.0 to 1.1 in its `task.toml`. The tech report (DOI 10.5281/zenodo.23829461) describes the 1.0 tasks and isn't changed.
 

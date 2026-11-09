@@ -1,12 +1,12 @@
 {
   "title": "When the delta is fake: A construction for catching no-op wins in agent evaluation",
-  "description": "<p>Technical note proposing an integrity layer (pass-bar) for agent-evaluation task authorship, and a concrete construction that makes fake improvement hard to hide.</p><p><strong>Claim.</strong> For ranking AUROC under a linear scorer, pure mean shift / constant score offset need not change order. Mean-only adaptation can therefore look like distribution-shift competence while leaving delta at zero. Pairing that invariance with a train-only label shortcut that flips at evaluation, plus a frozen control recomputed by the verifier, forces passing methods to drop the shortcut rather than rewrite the report.</p><p>Three reference tasks instantiate the pass-bar (nop starter, oracle, artifact-backed score, calibration). Includes a scored staged-fail rubric. Positioned relative to Terminal-Bench, Harbor, and Inspect. Synthetic fixtures. Methodological contribution; not a model leaderboard.</p>",
+  "description": "<p>Technical note proposing an integrity layer (pass-bar) for agent-evaluation task authorship, and a concrete construction that makes fake improvement hard to hide.</p><p><strong>Claim.</strong> For ranking AUROC under a linear scorer, pure mean shift / constant score offset need not change order. Mean-only adaptation can therefore look like distribution-shift competence while leaving delta at zero. Pairing that invariance with a train-only label shortcut that flips at evaluation, plus a frozen control recomputed by the verifier, forces passing methods to drop the shortcut rather than rewrite the report.</p><p>Three reference tasks instantiate the pass-bar (nop starter, oracle, artifact-backed score, calibration). Includes a scored staged-fail rubric. Positioned relative to Terminal-Bench, Harbor, and Inspect. Synthetic fixtures. Methodological contribution; not a model leaderboard.</p><p><strong>0.2.0.</strong> Adds a red team: per-task graders that score any submission, 23 attacks and 4 alternate correct solutions. 14 attacks passed the 0.1.x verifiers. Fixes include hidden eval labels and an absolute AUROC floor for site-shift-meter, generated-case grading for the ledger and ring tasks, and an audit-bound verifier for incident-tool-desk. One attack still passes and is documented in CHANGELOG.md.</p>",
   "upload_type": "publication",
   "publication_type": "technicalnote",
   "access_right": "open",
   "license": "mit-license",
   "language": "eng",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "creators": [
     {
       "name": "Mayank, Gyanu",

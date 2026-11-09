@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: Please cite this work using the metadata below.
 type: software
 title: "When the delta is fake: A construction for catching no-op wins in agent evaluation"
-version: "0.1.4"
-date-released: "2026-10-31"
+version: "0.2.0"
+date-released: "2026-11-09"
 authors:
   - family-names: Mayank
     given-names: Gyanu

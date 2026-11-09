@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 import subprocess
 import sys
@@ -27,14 +28,18 @@ def test_starter_delta_is_zero():
 
 def test_oracle_clears_gate():
     sys.path.insert(0, str(APP))
-    from baseline import control_auroc  # noqa: WPS433
+    from baseline import auroc, control_auroc, load_csv  # noqa: WPS433
 
     report = _run(SOLUTION)
     ctrl = control_auroc(APP / "data" / "train.csv", APP / "data" / "eval.csv")
     assert abs(report["control_auroc"] - ctrl) < 1e-6
     assert report["n_eval"] == 180
-    assert report["delta_auroc"] >= 0.08
-    assert report["model_auroc"] - report["control_auroc"] >= 0.08
+    assert report["delta_auroc"] >= 0.5
+    assert report["model_auroc"] - report["control_auroc"] >= 0.5
+    _, labels, _ = load_csv(APP / "data" / "eval.csv")
+    with (APP / "artifacts" / "scores.csv").open() as f:
+        scores = [float(row["score"]) for row in csv.DictReader(f)]
+    assert abs(auroc(labels, scores) - report["model_auroc"]) < 1e-6
 
 
 def test_control_is_recomputable():

@@ -27,7 +27,7 @@ _spec.loader.exec_module(oracle)
 TRAIN = APP / "data" / "train.csv"
 EVAL = APP / "data" / "eval.csv"
 OUT_DIR = REPO / "docs" / "figures"
-GATE = 0.08
+GATE = 0.5  # v1.1 gate, see tasks/site-shift-meter/CALIBRATION.md
 
 
 def _zscore(x_tr, s_tr, x_ev, s_ev):

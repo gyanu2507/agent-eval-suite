@@ -1,5 +1,5 @@
 {
-  "gate": 0.08,
+  "gate": 0.5,
   "n_eval": 180,
   "rows": [
     {
@@ -24,7 +24,7 @@
       "method": "Per-site z-score, keeps f4",
       "eval_auroc": 0.1068,
       "delta_vs_control": 0.0959,
-      "passes_gate": true
+      "passes_gate": false
     },
     {
       "method": "Drop shortcut f4, no adaptation",

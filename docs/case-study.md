@@ -10,13 +10,15 @@ Trains logistic regression on raw features, then copies that AUROC into both `co
 
 ## Why mean-only adaptation is insufficient
 
-Per-site z-scoring followed by the same logistic is a common first intervention. Under mean-only synthetic shift, ranking AUROC for a linear scorer is largely invariant to a constant score offset. Order is preserved, so the adapted model clears almost nothing against the control.
+Per-site normalization followed by the same logistic is a common first intervention. Under mean-only synthetic shift, ranking AUROC for a linear scorer is largely invariant to a constant score offset. Per-site mean-centering scores 0.0107 here, the same as the control.
+
+Z-scoring also rescales each feature, and that does move the ranking: 0.0108 to 0.1068 while still leaning on `f4`. That cleared the v1.0 gate of 0.08. v1.1 raises the gate to 0.5 (see the task's `CALIBRATION.md`).
 
 ## What breaks the control
 
 A strong label shortcut in `f4` on training sites is flipped on evaluation (anti-correlated noise). The frozen control in `baseline.py` relies on `f4` and collapses on S2. Dropping `f4` and z-scoring `f1`-`f3` per site (evaluation-site moments from unlabeled evaluation features) recovers a large delta.
 
-On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate: `delta_auroc >= 0.08`, with control recomputed within `1e-6`.
+On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate in v1.1: model AUROC recomputed from per-row scores must beat the recomputed control by 0.5. v1.0 used 0.08 and read the model number from the report.
 
 ## Pass conditions
 
@@ -27,7 +29,7 @@ On the checked-in CSVs: control AUROC ≈ 0.01, reference method ≈ 0.98. Gate:
 
 ## Blocked shortcuts
 
-Inflating delta without beating the frozen control. Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method.
+Inflating delta without beating the frozen control (v1.1 recomputes model AUROC from scores). Weakening the baseline in-place. Mean-only normalization that does not change ranking metrics. Editing goldens instead of changing the method. Still open: scoring with the eval labels, which ship in `eval.csv`.
 
 ---
 
@@ -58,4 +60,4 @@ DPO on top of green transcript SFT stayed train-ticket green when continuing the
 
 ## Blocked shortcuts (post-training)
 
-Reporting train loss or preference NLL as the headline. Open-loop gen that never talks to the desk. Memorizing one ticket’s evidence ids. Claiming scenario transfer without a held-out ticket and a programmatic replay verifier.
+Reporting train loss or preference NLL as the headline. Open-loop gen that never talks to the desk. Memorizing one ticket's evidence ids. Claiming scenario transfer without a held-out ticket and a programmatic replay verifier.

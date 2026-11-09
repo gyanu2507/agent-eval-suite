@@ -21,5 +21,9 @@ Public analogue of multi-turn repair on an event-sourced ledger. Private work us
 ## Anti-shortcuts
 
 - `data/events.json` is read-only for the agent.
-- Tests recompute expectations from the event stream, not from a checked-in golden file the agent can overwrite.
-- Hidden property tests cover ordering / dedupe / hold semantics beyond the fixture file.
+- `tests/grade.py` pins the fixture's SHA-256.
+- v1.1 compares the submission with the reference on 300 generated streams (`grade.generate_stream`). v1.0 only had the fixture and three small public cases, so a lookup table of their answers passed, and so did two real bugs: a RELEASE that frees the same hold twice, and a HOLD that overwrites an open hold with the same key. See `redteam/`.
+
+## Spec gaps the generator steps around
+
+The instruction doesn't say whether a failed HOLD burns its `dedupe_key`, or whether a RELEASE adds its own `wallet` field to the output. The reference says no to both. The generator only duplicates POST, DRAW and MOVE events, which always apply, so these two cases don't decide a grade.

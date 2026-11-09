@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 328" width="760" height="328" font-family="ui-sans-serif,system-ui,sans-serif" font-size="13">
 <style>.t{fill:#24292f}.m{fill:#57606a}.pass{fill:#1a7f37}.fail{fill:#afb8c1}.ax{stroke:#d0d7de}@media (prefers-color-scheme:dark){.t{fill:#e6edf3}.m{fill:#9198a1}.pass{fill:#3fb950}.fail{fill:#484f58}.ax{stroke:#30363d}}</style>
-<text class="t" x="0" y="20" font-weight="600" font-size="15">site-shift-meter: eval AUROC by method (n=180, gate = control + 0.08)</text>
+<text class="t" x="0" y="20" font-weight="600" font-size="15">site-shift-meter: eval AUROC by method (n=180, gate = control + 0.5)</text>
 <line class="ax" x1="360.0" y1="40" x2="360.0" y2="298"/>
 <text class="m" x="360.0" y="316" text-anchor="middle">0.00</text>
 <line class="ax" x1="442.5" y1="40" x2="442.5" y2="298"/>
@@ -11,8 +11,8 @@
 <text class="m" x="607.5" y="316" text-anchor="middle">0.75</text>
 <line class="ax" x1="690.0" y1="40" x2="690.0" y2="298"/>
 <text class="m" x="690.0" y="316" text-anchor="middle">1.00</text>
-<line x1="390.0" y1="40" x2="390.0" y2="298" stroke="#cf222e" stroke-dasharray="4 3"/>
-<text x="394.0" y="36" fill="#cf222e" font-size="12">gate</text>
+<line x1="528.6" y1="40" x2="528.6" y2="298" stroke="#cf222e" stroke-dasharray="4 3"/>
+<text x="532.6" y="36" fill="#cf222e" font-size="12">gate</text>
 <text class="t" x="350" y="65.0" text-anchor="end">Frozen control (all features, raw)</text>
 <rect class="fail" x="360" y="48" width="3.6" height="26" rx="3"/>
 <text class="t" x="369.6" y="65.0">0.011</text>
@@ -23,7 +23,7 @@
 <rect class="fail" x="360" y="128" width="3.5" height="26" rx="3"/>
 <text class="t" x="369.5" y="145.0">0.011</text>
 <text class="t" x="350" y="185.0" text-anchor="end">Per-site z-score, keeps f4</text>
-<rect class="pass" x="360" y="168" width="35.2" height="26" rx="3"/>
+<rect class="fail" x="360" y="168" width="35.2" height="26" rx="3"/>
 <text class="t" x="401.2" y="185.0">0.107</text>
 <text class="t" x="350" y="225.0" text-anchor="end">Drop shortcut f4, no adaptation</text>
 <rect class="pass" x="360" y="208" width="322.3" height="26" rx="3"/>

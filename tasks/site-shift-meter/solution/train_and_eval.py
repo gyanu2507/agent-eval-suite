@@ -3,12 +3,14 @@
 
 from __future__ import annotations
 
+import csv
 import json
+import os
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / "environment" / "app"
+ROOT = Path(os.environ.get("APP_DIR") or Path(__file__).resolve().parents[1] / "environment" / "app")
 sys.path.insert(0, str(ROOT))
 
 from baseline import (  # noqa: E402
@@ -98,6 +100,10 @@ def main() -> None:
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(report, indent=2) + "\n")
+    with (OUT.parent / "scores.csv").open("w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["score"])
+        w.writerows([[s] for s in scores])
     print(json.dumps(report, indent=2))
 
 

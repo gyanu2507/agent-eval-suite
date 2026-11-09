@@ -24,3 +24,12 @@ Long-horizon tool-use sample: multi-step incident response with an injected cloc
 - No credit for a hand-written resolution without a replaying audit.
 - Health settle requires `advance_clock` through `restart_settle_sec`.
 - Evidence must match payments timeout lines recomputed from the scenario.
+
+## Verifier changes in v1.1
+
+The red team (`redteam/`) got four policies past the v1.0 verifier. Each check below closes one:
+
+- `audit_valid`: only the documented tools may appear in the audit. v1.0 called any attribute, so a row naming the private `_record` method could fake a submit.
+- `healthy_at_submit`: payments must already be healthy when `submit_resolution` runs. v1.0 only looked at the end state, so submitting first and waiting afterwards passed.
+- `resolution_matches_audit`: `resolution.json` must match the submit in the audit. v1.0 trusted the file.
+- `evidence_seen`: every evidence id must have come back from a `get_logs` call before the submit. v1.0 accepted ids typed in from memory.

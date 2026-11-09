@@ -16,26 +16,45 @@ git clone https://github.com/gyanu2507/agent-eval-suite && cd agent-eval-suite
 ./scripts/reproduce.sh
 ```
 
-Needs Python 3.10+ and `pytest`. Everything else is stdlib, no GPU. It runs all 17 task tests, the `site-shift-meter` oracle, and the ablation below (under 10 seconds on a laptop).
+Needs Python 3.10+ and `pytest`. Everything else is stdlib, no GPU. It runs the 25 task tests, the `site-shift-meter` oracle, the ablation, and the red team below. About 16 seconds on a laptop.
 
 ## Result: site-shift-meter
 
 ![Eval AUROC by method on site-shift-meter](docs/figures/site-shift-ablation.svg)
 
-| Method | Eval AUROC | Delta vs control | Gate (>= 0.08) |
-| --- | --- | --- | --- |
-| Frozen control (all features, raw) | 0.0108 | 0 | fail |
-| Starter: copies control into model field | 0.0108 | 0 | fail |
-| Mean-only: per-site centering, keeps shortcut `f4` | 0.0107 | -0.0001 | fail |
-| Per-site z-score, keeps `f4` | 0.1068 | +0.0959 | pass |
-| Drop `f4`, no adaptation | 0.9766 | +0.9658 | pass |
-| Oracle: drop `f4` + per-site z-score | 0.9766 | +0.9658 | pass |
+| Method | Eval AUROC | Delta vs control | v1.0 gate (0.08) | v1.1 gate (0.5) |
+| --- | --- | --- | --- | --- |
+| Frozen control (all features, raw) | 0.0108 | 0 | fail | fail |
+| Starter: copies control into model field | 0.0108 | 0 | fail | fail |
+| Mean-only: per-site centering, keeps shortcut `f4` | 0.0107 | -0.0001 | fail | fail |
+| Per-site z-score, keeps `f4` | 0.1068 | +0.0959 | pass | fail |
+| Drop `f4`, no adaptation | 0.9766 | +0.9658 | pass | pass |
+| Oracle: drop `f4` + per-site z-score | 0.9766 | +0.9658 | pass | pass |
 
-n_eval = 180 (eval site S2; train sites S0 and S1, 220 rows each). Numbers come from [`scripts/site_shift_ablation.py`](scripts/site_shift_ablation.py), which writes [`docs/figures/site-shift-ablation.json`](docs/figures/site-shift-ablation.json).
+n_eval = 180. Eval is site S2, and training uses sites S0 and S1 with 220 rows each. Numbers come from [`scripts/site_shift_ablation.py`](scripts/site_shift_ablation.py), which writes [`docs/figures/site-shift-ablation.json`](docs/figures/site-shift-ablation.json).
 
-Reading it: pure mean-centering is a no-op under AUROC, as the invariance argument predicts. The control collapses to 0.011 because it latches onto `f4`, whose label association flips at eval. All of the oracle's gain comes from dropping `f4`. Per-site variance scaling adds nothing on this data.
+Pure mean-centering is a no-op under AUROC, as the invariance argument predicts. The control collapses to 0.011 because it latches onto `f4`, whose label association flips at eval. All of the oracle's gain comes from dropping `f4`, and per-site variance scaling adds nothing on this data. Z-scoring without dropping `f4` moved AUROC to 0.107, which was enough to clear the v1.0 gate. v1.1 gates at 0.5, halfway between that and the shortcut-free methods. The reasoning is in [the task's CALIBRATION.md](tasks/site-shift-meter/CALIBRATION.md).
 
-Known gap: per-site z-scoring that keeps `f4` clears the 0.08 gate (+0.096). It doesn't drop the shortcut, so the gate threshold is loose for that method. A threshold closer to the shortcut-free delta, or a test that the model ignores `f4`, would close it.
+## Red team
+
+Every task now has a grader, `tasks/<task>/tests/grade.py`, that scores any submission rather than only the reference. [`redteam/`](redteam) holds 21 attacks and 4 alternate correct solutions. Each attack is a plausible wrong answer or a cheat. Most are the reference with a single bug added, so a result traces back to one cause.
+
+```bash
+python3 redteam/run.py
+```
+
+The runner grades every candidate twice, under the v1.0 rules the tasks shipped with and under the current v1.1 rules. It works on a temp copy of `tasks/`, so an attack that edits fixtures can't touch the repo.
+
+| Task | Attacks | Pass v1.0 | Pass v1.1 | What got through v1.0 |
+| --- | --- | --- | --- | --- |
+| site-shift-meter | 5 | 3 | 1 | a typed-in `model_auroc`, z-scoring that keeps `f4`, scoring with the eval labels |
+| clearing-hold-ledger | 7 | 3 | 0 | a lookup table of the public test answers, a RELEASE that frees a hold twice, a HOLD that overwrites an open hold |
+| slot-ring-buffer | 3 | 2 | 0 | counting empty reads, rejecting a seq that wrapped |
+| incident-tool-desk | 6 | 4 | 0 | submitting before payments was healthy, evidence ids typed in without reading logs, a `resolution.json` that disagrees with the audit, a fake submit through the desk's private `_record` method |
+
+All 4 alternate solutions pass both versions. Full per-candidate output, including which checks failed, is in [`docs/figures/redteam-results.json`](docs/figures/redteam-results.json). The fixes are listed in [CHANGELOG.md](CHANGELOG.md).
+
+One hole is still open. `site-shift-meter` ships its eval labels in the agent-visible `eval.csv`, so scoring with the labels gets AUROC 1.0 and passes. Closing it means moving the labels behind the verifier, which changes the task's interface. The tech report describes the v1.0 tasks.
 
 ## Reference tasks
 

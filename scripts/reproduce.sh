@@ -13,3 +13,6 @@ python3 tasks/site-shift-meter/solution/train_and_eval.py
 
 echo "== site-shift-meter ablation (writes docs/figures/site-shift-ablation.{json,svg})"
 python3 scripts/site_shift_ablation.py
+
+echo "== red team: attacks and alternate solutions vs v1.0 and v1.1 graders"
+python3 redteam/run.py --json docs/figures/redteam-results.json
